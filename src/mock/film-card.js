@@ -1,92 +1,125 @@
-const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
+import {
+  getRandomInteger,
+  getRandomArrayElement,
+  getFloatingPointNumber,
+  createRandomArr} from '../until';
 
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
+import pluralize from 'pluralize';
 
-const getFloatingPointNumber = (min = 0, max = 10, exp = 1) => Number((Math.random() * (max - min) + min).toFixed(exp));
+import dayjs from 'dayjs';
 
-const generateRandomTitle = () => {
-  const titles = [
-    'The Dance of Life',
-    'Sagebrush Trail',
-    'The Man with the Golden Arm',
-    'Santa Claus Conquers the Martians',
-    'Popeye the Sailor Meets Sindbad the Sailor',
-    'The Great Flamarion',
-    'Made for Each Other',
-  ];
+const titles = [
+  'The Dance of Life',
+  'Sagebrush Trail',
+  'The Man with the Golden Arm',
+  'Santa Claus Conquers the Martians',
+  'Popeye the Sailor Meets Sindbad the Sailor',
+  'The Great Flamarion',
+  'Made for Each Other',
+];
 
-  const randomIndex = getRandomInteger(0, titles.length - 1);
+const images = [
+  'made-for-each-other.png',
+  'popeye-meets-sinbad.png',
+  'sagebrush-trail.jpg',
+  'santa-claus-conquers-the-martians.jpg',
+  'the-dance-of-life.jpg',
+  'the-great-flamarion.jpg',
+  'the-man-with-the-golden-arm.jpg',
+];
 
-  return titles[randomIndex];
-};
+const descriptions = [
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+  'Cras aliquet varius magna, non porta ligula feugiat eget.',
+  'Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.',
+  'Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
+  'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.',
+  'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
+  'Sed sed nisi sed augue convallis suscipit in sed felis.',
+  'Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.',
+  'In rutrum ac purus sit amet tempus.',
+];
 
-const generateImages = () => {
-  const images = [
-    'made-for-each-other.png',
-    'popeye-meets-sinbad.png',
-    'sagebrush-trail.jpg',
-    'santa-claus-conquers-the-martians.jpg',
-    'the-dance-of-life.jpg',
-    'the-great-flamarion.jpg',
-    'the-man-with-the-golden-arm.jpg',
-  ];
+const genres = [
+  'Musical',
+  'Western',
+  'Drama',
+  'Comedy',
+  'Mystery',
+  'Film-Noir',
+];
 
-  const randomIndex = getRandomInteger(0, images.length - 1);
+const ages = [
+  '0+',
+  '6+',
+  '12+',
+  '16+',
+  '18+',
+];
 
-  return images[randomIndex];
-};
+const directors = [
+  ' Anthony Mann',
+  ' Anne Wigton',
+  ' Heinz Herald',
+  ' Richard Weil',
+  ' Erich von Stroheim ',
+  ' Mary Beth Hughes',
+  ' Dan Duryea',
+];
 
-const generateDescription = () => {
-  const descriptions = [
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    'Cras aliquet varius magna, non porta ligula feugiat eget.',
-    'Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.',
-    'Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
-    'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.',
-    'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
-    'Sed sed nisi sed augue convallis suscipit in sed felis.',
-    'Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.',
-    'In rutrum ac purus sit amet tempus.',
-  ];
+const writers = [
+  ' Anthony Wigton',
+  ' Anne Weil',
+  ' Heinz Hughes',
+  ' Richard Mann',
+  ' Erich von Duryea',
+  ' Mary Beth Herald',
+  ' Dan Stroheim ',
+];
 
-  const randomIndex = getRandomInteger(0, descriptions.length - 1);
+const actors = [
+  ' Anne Wigton',
+  ' Dan Weil',
+  ' Erich Hughes',
+  ' Richard Mann',
+  ' Anthony von Duryea',
+  ' Anne Beth Herald',
+  ' Mary Stroheim',
+];
 
-  return descriptions[randomIndex];
-};
+const countries = [
+  'Russia',
+  'USA',
+  'Germany',
+  'Italy',
+  'Poland',
+];
 
-const generateDuration = (time) => `${Math.floor(time / 60)}h ${Math.floor(time % 60)}m`;
+const generateDuration = (time) =>Math.floor(time / 60);
 
-const generateGenre = () => {
-  const genres = [
-    'Musical',
-    'Western',
-    'Drama',
-    'Comedy',
-    'Mystery',
-  ];
+const generateComments = () => pluralize('comment', getRandomInteger(0, 5), true);
 
-  const randomIndex = getRandomInteger(0, genres.length - 1);
-
-  return genres[randomIndex];
-};
-
-const generateComments = () => {
-  const commentsCount = getRandomInteger(0, 5);
-
-  return commentsCount > 1 ? `${commentsCount} comments` : `${commentsCount} comment`;
+const generateDate = () => {
+  const randomDay = getRandomInteger(1, 7)
+  const randomMonth = getRandomInteger(0, 11);
+  const randomYear = getRandomInteger(-100, 0);
+  return dayjs().add(randomDay, 'day').add(randomMonth, 'month').add(randomYear, 'year').format('DD MMMM YYYY');
 };
 
 export const generateCardFilm = () => ({
-  title: generateRandomTitle(),
+  title: getRandomArrayElement(titles),
   rating: getFloatingPointNumber(),
   year: getRandomInteger(1900, 1980),
   duration: generateDuration(getRandomInteger(60, 300)),
-  genre: generateGenre(),
-  image: generateImages(),
-  description: generateDescription(),
+  genre: getRandomArrayElement(genres),
+  image: getRandomArrayElement(images),
+  description: getRandomArrayElement(descriptions),
   comments: generateComments(),
+  age: getRandomArrayElement(ages),
+  director: getRandomArrayElement(directors),
+  actors: createRandomArr(actors),
+  writers: createRandomArr(writers),
+  country: getRandomArrayElement(countries),
+  date: generateDate(),
 });
 
