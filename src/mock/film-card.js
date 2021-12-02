@@ -2,13 +2,13 @@ import {
   getRandomInteger,
   getRandomArrayElement,
   getFloatingPointNumber,
-  createRandomArr} from '../until';
+  createRandomArr} from '../util';
 
 import pluralize from 'pluralize';
 
 import dayjs from 'dayjs';
 
-const titles = [
+const TITLES = [
   'The Dance of Life',
   'Sagebrush Trail',
   'The Man with the Golden Arm',
@@ -18,7 +18,7 @@ const titles = [
   'Made for Each Other',
 ];
 
-const images = [
+const IMAGES = [
   'made-for-each-other.png',
   'popeye-meets-sinbad.png',
   'sagebrush-trail.jpg',
@@ -28,7 +28,7 @@ const images = [
   'the-man-with-the-golden-arm.jpg',
 ];
 
-const descriptions = [
+const DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
   'Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.',
@@ -40,7 +40,7 @@ const descriptions = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
-const genres = [
+const GENRES = [
   'Musical',
   'Western',
   'Drama',
@@ -49,7 +49,7 @@ const genres = [
   'Film-Noir',
 ];
 
-const ages = [
+const AGES = [
   '0+',
   '6+',
   '12+',
@@ -57,37 +57,37 @@ const ages = [
   '18+',
 ];
 
-const directors = [
-  ' Anthony Mann',
-  ' Anne Wigton',
-  ' Heinz Herald',
-  ' Richard Weil',
-  ' Erich von Stroheim ',
-  ' Mary Beth Hughes',
-  ' Dan Duryea',
+const DIRECTORS = [
+  'Anthony Mann',
+  'Anne Wigton',
+  'Heinz Herald',
+  'Richard Weil',
+  'Erich von Stroheim ',
+  'Mary Beth Hughes',
+  'Dan Duryea',
 ];
 
-const writers = [
-  ' Anthony Wigton',
-  ' Anne Weil',
-  ' Heinz Hughes',
-  ' Richard Mann',
-  ' Erich von Duryea',
-  ' Mary Beth Herald',
-  ' Dan Stroheim ',
+const WRITERS = [
+  'Anthony Wigton',
+  'Anne Weil',
+  'Heinz Hughes',
+  'Richard Mann',
+  'Erich von Duryea',
+  'Mary Beth Herald',
+  'Dan Stroheim ',
 ];
 
-const actors = [
-  ' Anne Wigton',
-  ' Dan Weil',
-  ' Erich Hughes',
-  ' Richard Mann',
-  ' Anthony von Duryea',
-  ' Anne Beth Herald',
-  ' Mary Stroheim',
+const ACTORS = [
+  'Anne Wigton',
+  'Dan Weil',
+  'Erich Hughes',
+  'Richard Mann',
+  'Anthony von Duryea',
+  'Anne Beth Herald',
+  'Mary Stroheim',
 ];
 
-const countries = [
+const COUNTRIES = [
   'Russia',
   'USA',
   'Germany',
@@ -100,26 +100,30 @@ const generateDuration = (time) =>Math.floor(time / 60);
 const generateComments = () => pluralize('comment', getRandomInteger(0, 5), true);
 
 const generateDate = () => {
-  const randomDay = getRandomInteger(1, 7)
+  const randomDay = getRandomInteger(1, 7);
   const randomMonth = getRandomInteger(0, 11);
   const randomYear = getRandomInteger(-100, 0);
   return dayjs().add(randomDay, 'day').add(randomMonth, 'month').add(randomYear, 'year').format('DD MMMM YYYY');
 };
 
 export const generateCardFilm = () => ({
-  title: getRandomArrayElement(titles),
+  title: getRandomArrayElement(TITLES),
   rating: getFloatingPointNumber(),
   year: getRandomInteger(1900, 1980),
   duration: generateDuration(getRandomInteger(60, 300)),
-  genre: getRandomArrayElement(genres),
-  image: getRandomArrayElement(images),
-  description: getRandomArrayElement(descriptions),
+  genre: getRandomArrayElement(GENRES),
+  genres: createRandomArr(GENRES),
+  image: getRandomArrayElement(IMAGES),
+  description: getRandomArrayElement(DESCRIPTIONS),
   comments: generateComments(),
-  age: getRandomArrayElement(ages),
-  director: getRandomArrayElement(directors),
-  actors: createRandomArr(actors),
-  writers: createRandomArr(writers),
-  country: getRandomArrayElement(countries),
+  age: getRandomArrayElement(AGES),
+  director: getRandomArrayElement(DIRECTORS),
+  actors: createRandomArr(ACTORS),
+  writers: createRandomArr(WRITERS),
+  country: getRandomArrayElement(COUNTRIES),
   date: generateDate(),
+  watchlist: Boolean(getRandomInteger(0, 1)),
+  already_watched: Boolean(getRandomInteger(0, 1)),
+  favorite: Boolean(getRandomInteger(0, 1)),
 });
 
