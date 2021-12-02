@@ -1,5 +1,3 @@
 export const createFilmsBoard = () => (
-  `
-    <section class="films"></section>
-  `
+  '<section class="films"></section>'
 );

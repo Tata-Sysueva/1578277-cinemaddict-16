@@ -1,8 +1,8 @@
-export const createFooterTemplate = () => (
-  `
-    <section class="footer__logo logo logo--smaller">Cinemaddict</section>
+export const createFooterTemplate = (filmsState) => {
+  const {countAllFilms} = filmsState;
+
+  return `<section class="footer__logo logo logo--smaller">Cinemaddict</section>
     <section class="footer__statistics">
-      <p>130 291 movies inside</p>
-    </section>
-  `
-);
+      <p>${countAllFilms} movies inside</p>
+    </section>`;
+};
