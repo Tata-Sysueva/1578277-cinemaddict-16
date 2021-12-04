@@ -1,30 +1,32 @@
-import {createProfileTemplate} from './view/profile-view';
-import {createSiteMenuTemplate} from './view/menu-view';
-import {createSortTemplate} from  './view/sort-view';
-import {createFilmsTemplate} from './view/films-view';
-import {createCardFilm} from './view/card-film-view';
-import {createFilmsBoard} from './view/films-board-view';
-import {createFooterTemplate} from './view/footer-view';
-import {createButtonShowMore} from './view/button-show-more';
-import {createFilmInfoTemplate} from './view/popup-film-info-view';
-import {RenderPosition, renderTemplate} from './render.js';
+import ProfileView from './view/profile-view';
+import MenuView from './view/menu-view';
+import SortView from  './view/sort-view';
+import FilmsView from './view/films-view';
+import CardFilmView from './view/card-film-view';
+import FilmsBoardView from './view/films-board-view';
+import FooterView from './view/footer-view';
+import ButtonShowMoreView from './view/button-show-more';
+import PopupFilmInfoView from './view/popup-film-info-view';
+import {RenderPosition, renderElement} from './render.js';
 import {generateCardFilm} from './mock/film-card.js';
 import {generateCountFilms} from './mock/films-state';
-import {createPopupTemplate} from './view/popup-container-view';
-import {createCommentsContainer} from './view/popup-comments-view';
+import PopupContainerView from './view/popup-container-view';
 import {generateComment} from './mock/comment';
-import {createComment} from './view/comment-view';
-import {createNewComment} from './view/new-comment-view';
+import CommentPopupView from './view/comment-view';
+import NewCommentView from './view/new-comment-view';
+import {generateFilters} from './mock/filters';
+import CommentsContainerView from './view/popup-comments-view';
+import PopupButtonCloseView from './view/popup-button-close-view';
+import PopupReactionsView from './view/popup-reactions-view';
 
 const CARD_COUNT = 25;
 const CARDS_COUNT_PER_STEP = 5;
 const CARDS_FILM_COUNT = 2;
-const FILM_STATE_COUNT = 1;
 const COMMENT_STATE_COUNT = 4;
 
 const cards = Array.from({length: CARD_COUNT}, generateCardFilm);
-const filmsState = Array.from({length: FILM_STATE_COUNT}, generateCountFilms);
 const comments = Array.from({length: COMMENT_STATE_COUNT}, generateComment);
+const filters = generateFilters(cards);
 
 const FilmsInfo = {
   ALL: {title: 'All movies. Upcoming', isExtra: false},
@@ -36,39 +38,29 @@ const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 
-const watchFilms = cards.filter((card) => !!card.watchlist);
-const alreadyWatchedFilms = cards.filter((card) => !!card.already_watched);
-const favoriteFilms = cards.filter((card) => !!card.favorite);
+renderElement(siteHeaderElement, new ProfileView().element);
+renderElement(siteMainElement, new MenuView(filters).element);
+renderElement(siteMainElement, new SortView().element);
 
-export const generateFilterFilms = () => ({
-  countWatchlistFilms: watchFilms.length,
-  countHistoryFilms: alreadyWatchedFilms.length,
-  countFavoritesFilms: favoriteFilms.length,
-});
-
-const filterFilms = Array.from({length: FILM_STATE_COUNT}, generateFilterFilms);
-
-
-renderTemplate(siteHeaderElement, createProfileTemplate());
-renderTemplate(siteMainElement, createSiteMenuTemplate(filterFilms[0]));
-renderTemplate(siteMainElement, createSortTemplate());
-renderTemplate(siteMainElement, createFilmsBoard());
+renderElement(siteMainElement, new FilmsBoardView().element);
 
 const filmsBoardElement = siteMainElement.querySelector('.films');
 
-renderTemplate(filmsBoardElement, createFilmsTemplate(FilmsInfo.ALL.title, FilmsInfo.ALL.isExtra));
+const getFilmsTemplate = (title, state) => new FilmsView(title, state);
+
+renderElement(filmsBoardElement, getFilmsTemplate(FilmsInfo.ALL.title, FilmsInfo.ALL.isExtra).element);
 
 const filmsCardContainer = filmsBoardElement.querySelector('.films-list');
 const filmsCardList = filmsBoardElement.querySelector('.films-list__container');
 
 for (let i = 1; i <= Math.min(cards.length, CARDS_COUNT_PER_STEP); i++) {
-  renderTemplate(filmsCardList, createCardFilm(cards[i]));
+  renderElement(filmsCardList, new CardFilmView(cards[i]).element);
 }
 
 if (cards.length > CARDS_COUNT_PER_STEP) {
   let renderedCardsCount = CARDS_COUNT_PER_STEP;
 
-  renderTemplate(filmsCardContainer, createButtonShowMore());
+  renderElement(filmsCardContainer, new ButtonShowMoreView().element);
 
   const showMoreButton = filmsCardContainer.querySelector('.films-list__show-more');
 
@@ -77,7 +69,7 @@ if (cards.length > CARDS_COUNT_PER_STEP) {
 
     cards
       .slice(renderedCardsCount, renderedCardsCount + CARDS_COUNT_PER_STEP)
-      .forEach((card) => renderTemplate(filmsCardList, createCardFilm(card)))
+      .forEach((card) => renderElement(filmsCardList, new CardFilmView(card).element));
 
     renderedCardsCount += CARDS_COUNT_PER_STEP;
 
@@ -87,31 +79,44 @@ if (cards.length > CARDS_COUNT_PER_STEP) {
   });
 }
 
-renderTemplate(filmsBoardElement, createFilmsTemplate(FilmsInfo.TOP.title, FilmsInfo.TOP.isExtra));
-renderTemplate(filmsBoardElement, createFilmsTemplate(FilmsInfo.MOST_COMMENT.title, FilmsInfo.MOST_COMMENT.isExtra));
+renderElement(filmsBoardElement, getFilmsTemplate(FilmsInfo.TOP.title, FilmsInfo.TOP.isExtra).element);
+renderElement(filmsBoardElement, getFilmsTemplate(FilmsInfo.MOST_COMMENT.title, FilmsInfo.MOST_COMMENT.isExtra).element);
 
 const filmsExtraContainers = siteMainElement.querySelectorAll('.films-list--extra .films-list__container');
 
 for (const filmsExtraContainer of filmsExtraContainers) {
   for (let i = 0; i < CARDS_FILM_COUNT; i++) {
-    renderTemplate(filmsExtraContainer, createCardFilm(cards[i]));
+    renderElement(filmsExtraContainer, new CardFilmView(cards[i]).element);
   }
 }
 
-renderTemplate(siteFooterElement, createFooterTemplate(filmsState[0]));
+renderElement(siteFooterElement, new FooterView(generateCountFilms()).element);
 
-renderTemplate(siteFooterElement, createPopupTemplate(), RenderPosition.AFTER_END);
+const cardFilmLinkElements = document.querySelectorAll('.film-card__link');
 
-const popupFilmInfoTemplate = document.querySelector('.film-details__top-container');
-const popupCommentsTemplate = document.querySelector('.film-details__bottom-container');
+const renderPopup = () => {
+  renderElement(siteFooterElement, new PopupContainerView().element, RenderPosition.AFTER_END);
 
-renderTemplate(popupFilmInfoTemplate, createFilmInfoTemplate(cards[0]));
+  const popupTemplate = document.querySelector('.film-details');
+  const popupFilmInfoTemplate = popupTemplate.querySelector('.film-details__top-container');
+  const popupCommentsTemplate = popupTemplate.querySelector('.film-details__bottom-container');
 
-  renderTemplate(popupCommentsTemplate, createCommentsContainer());
+  renderElement(popupFilmInfoTemplate, new PopupButtonCloseView().element);
+  renderElement(popupFilmInfoTemplate, new PopupFilmInfoView(cards[0]).element);
+  renderElement(popupFilmInfoTemplate, new PopupReactionsView(cards[0]).element);
+  renderElement(popupCommentsTemplate, new CommentsContainerView().element);
 
-const popupCommentsList = popupCommentsTemplate.querySelector('.film-details__comments-list');
-const popupNewCommentContainer = popupCommentsTemplate.querySelector('.film-details__comments-wrap');
+  const popupCommentsList = popupCommentsTemplate.querySelector('.film-details__comments-list');
+  const popupNewCommentContainer = popupCommentsTemplate.querySelector('.film-details__comments-wrap');
 
-comments.forEach((comment) => renderTemplate(popupCommentsList, createComment(comment)));
+  comments.forEach((comment) => renderElement(popupCommentsList, new CommentPopupView(comment).element));
 
-renderTemplate(popupNewCommentContainer, createNewComment());
+  renderElement(popupNewCommentContainer, new NewCommentView().element);
+};
+
+cardFilmLinkElements.forEach((cardFilmLinkElement) => cardFilmLinkElement
+  .addEventListener('click', (evt) => {
+    evt.preventDefault();
+    renderPopup();
+  })
+);
