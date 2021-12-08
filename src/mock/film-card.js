@@ -126,4 +126,3 @@ export const generateCardFilm = () => ({
   alreadyWatched: Boolean(getRandomInteger(0, 1)),
   favorite: Boolean(getRandomInteger(0, 1)),
 });
-

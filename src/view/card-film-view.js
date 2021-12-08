@@ -1,6 +1,6 @@
 import {createElement} from '../render';
 
-const createCardFilm = (cardsFilms) => {
+const createCardFilm = (filmInfo) => {
   const {
     title,
     rating,
@@ -13,7 +13,7 @@ const createCardFilm = (cardsFilms) => {
     watchlist,
     alreadyWatched,
     favorite,
-  } = cardsFilms;
+  } = filmInfo;
 
   return `<article class="film-card">
     <a class="film-card__link">
@@ -53,10 +53,10 @@ const createCardFilm = (cardsFilms) => {
 
 export default class CardFilmView {
   #element = null;
-  #cardsFilms = null;
+  #filmInfo = null;
 
-  constructor(cardsFilms) {
-    this.#cardsFilms = cardsFilms;
+  constructor(filmInfo) {
+    this.#filmInfo = filmInfo;
   }
 
   get element() {
@@ -68,7 +68,7 @@ export default class CardFilmView {
   }
 
   get template() {
-    return createCardFilm(this.#cardsFilms);
+    return createCardFilm(this.#filmInfo);
   }
 
   removeElement() {

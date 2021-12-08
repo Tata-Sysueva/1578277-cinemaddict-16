@@ -1,6 +1,6 @@
 import {createElement} from '../render';
 
-const createFilmInfoTemplate = (cardsFilms) => {
+const createFilmInfoTemplate = (filmInfo) => {
   const {
     title,
     rating,
@@ -14,7 +14,7 @@ const createFilmInfoTemplate = (cardsFilms) => {
     writers,
     country,
     date,
-  } = cardsFilms;
+  } = filmInfo;
 
   return `<div class="film-details__info-wrap">
     <div class="film-details__poster">
@@ -76,10 +76,10 @@ const createFilmInfoTemplate = (cardsFilms) => {
 
 export default class PopupFilmInfoView {
   #element = null;
-  #cardsFilms = null;
+  #filmInfo = null;
 
-  constructor(cardsFilms) {
-    this.#cardsFilms = cardsFilms;
+  constructor(filmInfo) {
+    this.#filmInfo = filmInfo;
   }
 
   get element() {
@@ -91,7 +91,7 @@ export default class PopupFilmInfoView {
   }
 
   get template() {
-    return createFilmInfoTemplate(this.#cardsFilms);
+    return createFilmInfoTemplate(this.#filmInfo);
   }
 
   removeElement() {
