@@ -48,4 +48,4 @@ export const generateComment = () => ({
   date: generateDate(),
   text: getRandomArrayElement(text),
   reaction: getRandomArrayElement(reaction),
-})
+});
