@@ -4,8 +4,6 @@ import {
   getFloatingPointNumber,
   createRandomArr} from '../util';
 
-import pluralize from 'pluralize';
-
 import dayjs from 'dayjs';
 
 const TITLES = [
@@ -97,8 +95,6 @@ const COUNTRIES = [
 
 const generateDuration = (time) =>Math.floor(time / 60);
 
-const generateComments = () => pluralize('comment', getRandomInteger(0, 5), true);
-
 const generateDate = () => {
   const randomDay = getRandomInteger(1, 7);
   const randomMonth = getRandomInteger(0, 11);
@@ -115,7 +111,7 @@ export const generateCardFilm = () => ({
   genres: createRandomArr(GENRES),
   image: getRandomArrayElement(IMAGES),
   description: getRandomArrayElement(DESCRIPTIONS),
-  comments: generateComments(),
+  comments: getRandomInteger(0, 15),
   age: getRandomArrayElement(AGES),
   director: getRandomArrayElement(DIRECTORS),
   actors: createRandomArr(ACTORS),

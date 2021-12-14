@@ -1,4 +1,4 @@
-import {createElement} from '../render';
+import AbstractView from './abstract-view';
 
 const createPopupReactionsTemplate = (cardsFilms) => {
   const {
@@ -35,27 +35,15 @@ const createPopupReactionsTemplate = (cardsFilms) => {
   </section>`;
 };
 
-export default class PopupReactionsView {
-  #element = null;
+export default class PopupReactionsView extends AbstractView {
   #cardsFilms = null;
 
   constructor(cardsFilms) {
+    super();
     this.#cardsFilms = cardsFilms;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createPopupReactionsTemplate(this.#cardsFilms);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

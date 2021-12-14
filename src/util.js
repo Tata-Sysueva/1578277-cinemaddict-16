@@ -24,10 +24,13 @@ const createRandomArr = (array) => shuffle(array).slice(0, getRandomInteger(0, a
 
 const uppercaseFirstLetter = (string) => string.slice(0,1).toUpperCase() + string.slice(1);
 
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
 export {
   getRandomInteger,
   getFloatingPointNumber,
   getRandomArrayElement,
   createRandomArr,
   uppercaseFirstLetter,
+  isEscapeKey,
 };

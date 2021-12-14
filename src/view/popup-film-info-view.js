@@ -1,4 +1,4 @@
-import {createElement} from '../render';
+import AbstractView from './abstract-view';
 
 const createFilmInfoTemplate = (filmInfo) => {
   const {
@@ -74,27 +74,15 @@ const createFilmInfoTemplate = (filmInfo) => {
   </div>`;
 };
 
-export default class PopupFilmInfoView {
-  #element = null;
+export default class PopupFilmInfoView extends AbstractView {
   #filmInfo = null;
 
   constructor(filmInfo) {
+    super();
     this.#filmInfo = filmInfo;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createFilmInfoTemplate(this.#filmInfo);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
