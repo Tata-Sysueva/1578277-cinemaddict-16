@@ -1,15 +1,10 @@
-import {createElement} from '../render';
+import {createElement, renderElement} from '../render';
 import PopupButtonCloseView from './popup-button-close-view';
 import PopupFilmInfoView from './popup-film-info-view';
 import PopupReactionsView from './popup-reactions-view';
 import CommentsContainerView from './popup-comments-view';
 import NewCommentView from './new-comment-view';
-import {generateComment} from '../mock/comment';
-import CommentPopupView from './comment-view';
-
-const COMMENT_STATE_COUNT = 4;
-
-const comments = Array.from({length: COMMENT_STATE_COUNT}, generateComment);
+import AbstractView from './abstract-view';
 
 const createPopupTemplate = () => (
   `<section class="film-details">
@@ -20,11 +15,16 @@ const createPopupTemplate = () => (
   </section>`
 );
 
-export default class PopupContainerView {
+export default class PopupContainerView extends AbstractView {
   #element = null;
   #film = null;
+  #topContainer = null;
+  #bottomContainer = null;
+  #closeButton = null;
+
 
   constructor(film) {
+    super();
     this.#film = film;
   }
 
@@ -32,16 +32,16 @@ export default class PopupContainerView {
     if (!this.#element) {
       this.#element = createElement(this.template);
     }
-    this._topContainer = this.#element.querySelector('.film-details__top-container');
-    this._bottomContainer = this.#element.querySelector('.film-details__bottom-container');
+    this.#topContainer = this.#element.querySelector('.film-details__top-container');
+    this.#bottomContainer = this.#element.querySelector('.film-details__bottom-container');
+    this.#closeButton = new PopupButtonCloseView().element;
 
-    this._topContainer.append(new PopupButtonCloseView().element);
-    this._topContainer.append(new PopupFilmInfoView(this.#film).element);
-    this._topContainer.append(new PopupReactionsView(this.#film).element);
+    renderElement(this.#topContainer, this.#closeButton);
+    renderElement(this.#topContainer, new PopupFilmInfoView(this.#film).element);
+    renderElement(this.#topContainer, new PopupReactionsView(this.#film).element);
 
-    this._bottomContainer.append(new CommentsContainerView().element);
-    comments.forEach((comment) => this._bottomContainer.append(new CommentPopupView(comment).element));
-    this._bottomContainer.append(new NewCommentView().element);
+    renderElement(this.#bottomContainer, new CommentsContainerView().element);
+    renderElement(this.#bottomContainer, new NewCommentView().element);
 
     return this.#element;
   }
@@ -50,7 +50,14 @@ export default class PopupContainerView {
     return createPopupTemplate();
   }
 
-  removeElement() {
-    this.#element = null;
+  setOnCloseButtonClick = (callback) => {
+    this._callback.click = callback;
+    this.#closeButton.addEventListener('click', this.#onCloseButtonClick);
+  }
+
+  #onCloseButtonClick = (evt) => {
+    evt.preventDefault();
+    this.#closeButton = null;
+    this._callback.click();
   }
 }

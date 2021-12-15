@@ -1,4 +1,4 @@
-import {uppercaseFirstLetter} from '../util';
+import {uppercaseFirstLetter} from '../utils';
 import AbstractView from './abstract-view';
 
 const createFilterTemplate = (name,count) => (

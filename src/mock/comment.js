@@ -1,4 +1,4 @@
-import {getRandomArrayElement, getRandomInteger} from '../util';
+import {getRandomArrayElement, getRandomInteger} from '../utils';
 import dayjs from 'dayjs';
 
 const author = [
