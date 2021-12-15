@@ -1,3 +1,5 @@
+import AbstractView from './view/abstract-view';
+
 export const RenderPosition = {
   BEFORE_BEGIN: 'beforebegin',
   AFTER_BEGIN: 'afterbegin',
@@ -31,5 +33,18 @@ export const createElement = (template) => {
   newElement.innerHTML = template;
 
   return newElement.firstChild;
+};
+
+export const removeElement = (component) => {
+  if (component === null) {
+    return;
+  }
+
+  if (!(component instanceof AbstractView)) {
+    throw new Error('Can remove only components');
+  }
+
+  component.element.remove();
+  component.removeElement();
 };
 

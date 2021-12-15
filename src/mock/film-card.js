@@ -2,9 +2,7 @@ import {
   getRandomInteger,
   getRandomArrayElement,
   getFloatingPointNumber,
-  createRandomArr} from '../util';
-
-import pluralize from 'pluralize';
+  createRandomArr} from '../utils';
 
 import dayjs from 'dayjs';
 
@@ -95,9 +93,13 @@ const COUNTRIES = [
   'Poland',
 ];
 
-const generateDuration = (time) =>Math.floor(time / 60);
+const COMMENTS = [];
 
-const generateComments = () => pluralize('comment', getRandomInteger(0, 5), true);
+for (let i = 0; i < getRandomInteger(0, 100); i++ ) {
+  COMMENTS.push(`${getRandomInteger(0, 1000)}`);
+}
+
+const generateDuration = (time) =>Math.floor(time / 60);
 
 const generateDate = () => {
   const randomDay = getRandomInteger(1, 7);
@@ -115,7 +117,7 @@ export const generateCardFilm = () => ({
   genres: createRandomArr(GENRES),
   image: getRandomArrayElement(IMAGES),
   description: getRandomArrayElement(DESCRIPTIONS),
-  comments: generateComments(),
+  comments: createRandomArr(COMMENTS).length,
   age: getRandomArrayElement(AGES),
   director: getRandomArrayElement(DIRECTORS),
   actors: createRandomArr(ACTORS),

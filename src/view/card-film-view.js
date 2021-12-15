@@ -1,4 +1,5 @@
-import {createElement} from '../render';
+import pluralize from 'pluralize';
+import AbstractView from './abstract-view';
 
 const createCardFilm = (filmInfo) => {
   const {
@@ -26,7 +27,7 @@ const createCardFilm = (filmInfo) => {
       </p>
       <img src="./images/posters/${image}" alt="${title}" class="film-card__poster">
       <p class="film-card__description">${description}</p>
-      <span class="film-card__comments">${comments}</span>
+      <span class="film-card__comments">${comments} ${pluralize('comment', comments)}</span>
     </a>
     <div class="film-card__controls">
       <button
@@ -51,27 +52,25 @@ const createCardFilm = (filmInfo) => {
   </article>`;
 };
 
-export default class CardFilmView {
-  #element = null;
+export default class CardFilmView extends AbstractView {
   #filmInfo = null;
 
   constructor(filmInfo) {
+    super();
     this.#filmInfo = filmInfo;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createCardFilm(this.#filmInfo);
   }
 
-  removeElement() {
-    this.#element = null;
+  setOnPopupClick = (callback) => {
+    this._callback.click = callback;
+    this.element.addEventListener('click', this.#onPopupClick);
+  }
+
+  #onPopupClick = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
   }
 }

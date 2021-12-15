@@ -1,4 +1,4 @@
-import {createElement} from '../render';
+import AbstractView from './abstract-view';
 
 const createPopupButtonClose = () =>(
   `<div class="film-details__close">
@@ -6,22 +6,8 @@ const createPopupButtonClose = () =>(
   </div>`
 );
 
-export default class PopupButtonCloseView {
-  #element = null;
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
+export default class PopupButtonCloseView extends AbstractView {
   get template() {
     return createPopupButtonClose();
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

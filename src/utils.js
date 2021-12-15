@@ -1,3 +1,8 @@
+const FilmsSortType = {
+  TOP_RATED: 'Top rated',
+  MOST_COMMENTED: 'Most commented',
+};
+
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -24,10 +29,26 @@ const createRandomArr = (array) => shuffle(array).slice(0, getRandomInteger(0, a
 
 const uppercaseFirstLetter = (string) => string.slice(0,1).toUpperCase() + string.slice(1);
 
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
+const getSortedFilms = (films, sortType) => {
+  switch (sortType) {
+    case FilmsSortType.TOP_RATED:
+      return films.slice().sort((a, b) => b.rating - a.rating);
+    case FilmsSortType.MOST_COMMENTED:
+      return films.slice().sort((a, b) => b.comments - a.comments);
+    default:
+      throw new Error(`Unknown sort type ${sortType}`);
+  }
+};
+
 export {
   getRandomInteger,
   getFloatingPointNumber,
   getRandomArrayElement,
   createRandomArr,
   uppercaseFirstLetter,
+  isEscapeKey,
+  FilmsSortType,
+  getSortedFilms,
 };
