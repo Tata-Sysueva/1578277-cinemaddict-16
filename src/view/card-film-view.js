@@ -1,5 +1,7 @@
 import pluralize from 'pluralize';
 import AbstractView from './abstract-view';
+import PopupButtonCloseView from './popup-button-close-view';
+import {createElement} from '../render';
 
 const createCardFilm = (filmInfo) => {
   const {
@@ -53,11 +55,27 @@ const createCardFilm = (filmInfo) => {
 };
 
 export default class CardFilmView extends AbstractView {
+  #element = null;
   #filmInfo = null;
+  #addWatchList = null;
+  #addHistory = null;
+  #addFavorites = null;
 
   constructor(filmInfo) {
     super();
     this.#filmInfo = filmInfo;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    this.#addWatchList = this.#element.querySelector('.film-card__controls-item--add-to-watchlist');
+    this.#addHistory = this.#element.querySelector('.film-card__controls-item--mark-as-watched');
+    this.#addFavorites = this.#element.querySelector('.film-card__controls-item--favorite');
+
+    return this.#element;
   }
 
   get template() {
@@ -70,6 +88,16 @@ export default class CardFilmView extends AbstractView {
   }
 
   #onPopupClick = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  }
+
+  setOnFilmWatchedCheck = (callback) => {
+    this._callback.click = callback;
+    this.#addWatchList.addEventListener('click', this.#onFilmCheck);
+  }
+
+  #onFilmCheck = (evt) => {
     evt.preventDefault();
     this._callback.click();
   }

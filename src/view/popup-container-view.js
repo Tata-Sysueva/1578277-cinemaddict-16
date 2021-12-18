@@ -32,6 +32,7 @@ export default class PopupContainerView extends AbstractView {
     if (!this.#element) {
       this.#element = createElement(this.template);
     }
+
     this.#topContainer = this.#element.querySelector('.film-details__top-container');
     this.#bottomContainer = this.#element.querySelector('.film-details__bottom-container');
     this.#closeButton = new PopupButtonCloseView().element;
