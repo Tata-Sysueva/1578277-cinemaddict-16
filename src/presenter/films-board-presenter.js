@@ -1,9 +1,10 @@
 import FilmsBoardView from '../view/films-board-view';
 import FilmsView from '../view/films-view';
 import ButtonShowMoreView from '../view/button-show-more';
-import {renderElement} from '../render.js';
-import {FilmsSortType, getSortedFilms} from '../utils';
+import {render} from '../render.js';
+import {FilmsSortType, getSortedFilms, updateItem} from '../utils';
 import CardFilmPresenter from './card-film-presenter';
+import FilmsContainerView from '../view/films-container-view';
 
 const CARDS_COUNT_PER_STEP = 5;
 
@@ -17,17 +18,20 @@ const FilmsInfo = {
   EMPTY_FAVORITES: {title: 'There are no favorite movies now', isExtra: false},
 };
 
-export  default class FilmsSectionsPresenter {
+const from = 0;
+const to = 2;
+
+export default class FilmsSectionsPresenter {
   #boardContainer = null;
   #filmsList = null;
   #filmsContainer = null;
-  #cardFilmPresenter = null;
 
   #filmsBoardElement = new FilmsBoardView().element;
   #showMoreButton = new ButtonShowMoreView();
 
   #filmsInfo = [];
   #renderedCardsCount = CARDS_COUNT_PER_STEP;
+  #cardFilmPresenter = new Map();
 
 
   constructor(boardContainer) {
@@ -37,13 +41,13 @@ export  default class FilmsSectionsPresenter {
   init = (filmsInfo) => {
     this.#filmsInfo = [...filmsInfo];
 
-    renderElement(this.#boardContainer, this.#filmsBoardElement);
+    render(this.#boardContainer, this.#filmsBoardElement);
 
-    this.#renderFilmsSections();
+    this.#renderFilmsSections(from, to);
   }
 
   #onShowMoreButtonClick = () => {
-    this.#cardFilmPresenter.init(
+    this.#renderCards(
       this.#filmsInfo.slice(
         this.#renderedCardsCount,
         this.#renderedCardsCount + CARDS_COUNT_PER_STEP
@@ -58,21 +62,36 @@ export  default class FilmsSectionsPresenter {
   }
 
   #renderShowMoreButton = () => {
-    renderElement(this.#filmsList, this.#showMoreButton.element);
+    render(this.#filmsList, this.#showMoreButton.element);
     this.#showMoreButton.setOnShowMoreButtonClick(this.#onShowMoreButtonClick);
+  }
+
+  #renderCard = (film) => {
+    const cardFilmPresenter = new CardFilmPresenter(this.#filmsContainer, this.#handleFilmChange);
+    cardFilmPresenter.init(film);
+    this.#cardFilmPresenter.set(film.id, cardFilmPresenter);
+
+  }
+
+  #renderCards = (films) => {
+    films.forEach((film) => this.#renderCard(film));
+  }
+
+  #handleFilmChange = (updatedCard) => {
+    this.#filmsInfo = updateItem(this.#filmsInfo, updatedCard);
+    this.#cardFilmPresenter.get(updatedCard.id).init(updatedCard);
   }
 
   #renderFilmsSection = (title, isExtra, films) => {
     this.#filmsList = new FilmsView(title, isExtra).element;
-    renderElement(this.#filmsBoardElement, this.#filmsList);
-
-    this.#cardFilmPresenter = new CardFilmPresenter(this.#filmsList);
-
+    this.#filmsContainer = new FilmsContainerView().element;
+    render(this.#filmsBoardElement, this.#filmsList);
+    render(this.#filmsList, this.#filmsContainer);
 
     if (isExtra) {
-      this.#cardFilmPresenter.init(films);
+      this.#renderCards(films);
     } else {
-      this.#cardFilmPresenter.init(
+      this.#renderCards(
         films.slice(0, Math.min(films.length, CARDS_COUNT_PER_STEP))
       );
 
@@ -82,21 +101,21 @@ export  default class FilmsSectionsPresenter {
     }
   }
 
-  #renderEmptySection = () => {
-    renderElement(this.#filmsBoardElement, new FilmsView(this.#filmsInfo, this.#filmsContainer));
+  #renderEmptySection = (title, isExtra) => {
+    render(this.#filmsBoardElement, new FilmsView(title, isExtra));
   }
 
-  #renderFilmsSections = () => {
-    if (this.#filmsInfo.length > 0 ) {
+  #renderFilmsSections = (from, to) => {
+    if (this.#filmsInfo.length > from ) {
       this.#renderFilmsSection(FilmsInfo.ALL.title, FilmsInfo.ALL.isExtra, this.#filmsInfo);
-      this.#renderFilmsSection(
-        FilmsInfo.TOP_RATED.title,
-        FilmsInfo.TOP_RATED.isExtra,
-        getSortedFilms(this.#filmsInfo, FilmsSortType.TOP_RATED).slice(0, 2));
-      this.#renderFilmsSection(
-        FilmsInfo.MOST_COMMENTED.title,
-        FilmsInfo.MOST_COMMENTED.isExtra,
-        getSortedFilms(this.#filmsInfo, FilmsSortType.MOST_COMMENTED).slice(0, 2));
+      // this.#renderFilmsSection(
+      //   FilmsInfo.TOP_RATED.title,
+      //   FilmsInfo.TOP_RATED.isExtra,
+      //   getSortedFilms(this.#filmsInfo, FilmsSortType.TOP_RATED).slice(from, to));
+      // this.#renderFilmsSection(
+      //   FilmsInfo.MOST_COMMENTED.title,
+      //   FilmsInfo.MOST_COMMENTED.isExtra,
+      //   getSortedFilms(this.#filmsInfo, FilmsSortType.MOST_COMMENTED).slice(from, to));
     } else {
       this.#renderEmptySection(FilmsInfo.EMPTY_ALL.title, FilmsInfo.EMPTY_ALL.isExtra);
     }

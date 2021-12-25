@@ -2,7 +2,7 @@ import ProfileView from './view/profile-view';
 import MenuView from './view/menu-view';
 import SortView from './view/sort-view';
 import FooterView from './view/footer-view';
-import {renderElement} from './render.js';
+import {render} from './render.js';
 import {generateCardFilm} from './mock/film-card.js';
 import {generateCountFilms} from './mock/films-state';
 import {generateFilters} from './filters';
@@ -19,10 +19,10 @@ const siteFooterElement = document.querySelector('.footer');
 
 const filmsSectionsPresenter = new FilmsSectionsPresenter(siteMainElement);
 
-renderElement(siteHeaderElement, new ProfileView().element);
-renderElement(siteMainElement, new MenuView(filters).element);
-renderElement(siteMainElement, new SortView().element);
+render(siteHeaderElement, new ProfileView().element);
+render(siteMainElement, new MenuView(filters).element);
+render(siteMainElement, new SortView().element);
 
-renderElement(siteFooterElement, new FooterView(generateCountFilms()).element);
+render(siteFooterElement, new FooterView(generateCountFilms()));
 
 filmsSectionsPresenter.init(cards);
