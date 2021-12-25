@@ -1,75 +1,64 @@
 import AbstractView from './abstract-view';
 
-const createFilmInfoTemplate = (filmInfo) => {
+const createFilmInfoTemplate = (filmsInfo) => {
   const {
-    title,
-    rating,
-    image,
-    duration,
-    genres,
-    description,
-    age,
-    director,
-    actors,
-    writers,
-    country,
-    date,
-  } = filmInfo;
+    filmInfo,
+  } = filmsInfo;
 
   return `<div class="film-details__info-wrap">
     <div class="film-details__poster">
-      <img class="film-details__poster-img" src="./images/posters/${image}" alt="${title}">
+      <img class="film-details__poster-img" src="./images/posters/${filmInfo.poster}" alt="${filmInfo.title}">
 
-      <p class="film-details__age">${age}</p>
+      <p class="film-details__age">${filmInfo.ageRating}</p>
     </div>
 
     <div class="film-details__info">
       <div class="film-details__info-head">
         <div class="film-details__title-wrap">
-          <h3 class="film-details__title">${title}</h3>
-          <p class="film-details__title-original">Original: ${title}</p>
+          <h3 class="film-details__title">${filmInfo.title}</h3>
+          <p class="film-details__title-original">Original: ${filmInfo.alternativeTitle}</p>
         </div>
 
         <div class="film-details__rating">
-          <p class="film-details__total-rating">${rating}</p>
+          <p class="film-details__total-rating">${filmInfo.totalRating}</p>
         </div>
     </div>
 
     <table class="film-details__table">
       <tr class="film-details__row">
         <td class="film-details__term">Director</td>
-        <td class="film-details__cell">${director}</td>
+        <td class="film-details__cell">${filmInfo.director}</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Writers</td>
-        <td class="film-details__cell">${writers}</td>
+        <td class="film-details__cell">${filmInfo.writers}</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Actors</td>
-        <td class="film-details__cell">${actors}</td>
+        <td class="film-details__cell">${filmInfo.actors}</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Release Date</td>
-        <td class="film-details__cell">${date}</td>
+        <td class="film-details__cell">${filmInfo.release.date}</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Runtime</td>
-        <td class="film-details__cell">${duration}h ${duration}m</td>
+        <td class="film-details__cell">${filmInfo.runtime}h ${filmInfo.runtime}m</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Country</td>
-        <td class="film-details__cell">${country}</td>
+        <td class="film-details__cell">${filmInfo.release.country}</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Genres</td>
         <td class="film-details__cell">
-          ${genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join(' ')}
+          ${filmInfo.genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join(' ')}
         </td>
       </tr>
     </table>
 
     <p class="film-details__film-description">
-      ${description}
+      ${filmInfo.description}
     </p>
   </div>`;
 };

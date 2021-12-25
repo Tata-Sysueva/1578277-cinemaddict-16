@@ -5,6 +5,7 @@ import {
   createRandomArr} from '../utils';
 
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 
 const TITLES = [
   'The Dance of Life',
@@ -109,22 +110,49 @@ const generateDate = () => {
 };
 
 export const generateCardFilm = () => ({
-  title: getRandomArrayElement(TITLES),
-  rating: getFloatingPointNumber(),
-  year: getRandomInteger(1900, 1980),
-  duration: generateDuration(getRandomInteger(60, 300)),
-  genre: getRandomArrayElement(GENRES),
-  genres: createRandomArr(GENRES),
-  image: getRandomArrayElement(IMAGES),
-  description: getRandomArrayElement(DESCRIPTIONS),
+  // id: nanoid(),
+  // title: getRandomArrayElement(TITLES),
+  // rating: getFloatingPointNumber(),
+  // year: getRandomInteger(1900, 1980),
+  // duration: generateDuration(getRandomInteger(60, 300)),
+  // genre: getRandomArrayElement(GENRES),
+  // genres: createRandomArr(GENRES),
+  // image: getRandomArrayElement(IMAGES),
+  // description: getRandomArrayElement(DESCRIPTIONS),
+  // comments: createRandomArr(COMMENTS).length,
+  // age: getRandomArrayElement(AGES),
+  // director: getRandomArrayElement(DIRECTORS),
+  // actors: createRandomArr(ACTORS),
+  // writers: createRandomArr(WRITERS),
+  // country: getRandomArrayElement(COUNTRIES),
+  // date: generateDate(),
+  // watchlist: Boolean(getRandomInteger(0, 1)),
+  // alreadyWatched: Boolean(getRandomInteger(0, 1)),
+  // favorite: Boolean(getRandomInteger(0, 1)),
+
+  id: nanoid(),
   comments: createRandomArr(COMMENTS).length,
-  age: getRandomArrayElement(AGES),
-  director: getRandomArrayElement(DIRECTORS),
-  actors: createRandomArr(ACTORS),
-  writers: createRandomArr(WRITERS),
-  country: getRandomArrayElement(COUNTRIES),
-  date: generateDate(),
-  watchlist: Boolean(getRandomInteger(0, 1)),
-  alreadyWatched: Boolean(getRandomInteger(0, 1)),
-  favorite: Boolean(getRandomInteger(0, 1)),
+  filmInfo: {
+    title: getRandomArrayElement(TITLES),
+    alternativeTitle: getRandomArrayElement(TITLES),
+    totalRating: getFloatingPointNumber(),
+    poster: getRandomArrayElement(IMAGES),
+    ageRating: getRandomArrayElement(AGES),
+    director: getRandomArrayElement(DIRECTORS),
+    writers: createRandomArr(WRITERS),
+    actors: createRandomArr(ACTORS),
+    release: {
+      date: getRandomInteger(1900, 1980),
+      releaseCountry: getRandomArrayElement(COUNTRIES),
+    },
+    runtime: generateDuration(getRandomInteger(60, 300)),
+    genre: getRandomArrayElement(GENRES),
+    genres: createRandomArr(GENRES),
+    description: getRandomArrayElement(DESCRIPTIONS),
+  },
+    watchlist: Boolean(getRandomInteger(0, 1)),
+    alreadyWatched: Boolean(getRandomInteger(0, 1)),
+    watchingDate: generateDate(),
+    favorite: Boolean(getRandomInteger(0, 1)),
+
 });
