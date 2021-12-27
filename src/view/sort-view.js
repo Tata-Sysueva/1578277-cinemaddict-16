@@ -19,7 +19,7 @@ const createSortTemplate = () => (
       </a>
     </li>
     <li>
-      <a href="#" class="sort__button sort__button--active" data-sort-type="${SortType.BY_RATING}">
+      <a href="#" class="sort__button" data-sort-type="${SortType.BY_RATING}">
         Sort by rating
       </a>
     </li>
@@ -27,6 +27,8 @@ const createSortTemplate = () => (
 );
 
 export default class SortView extends AbstractView {
+  #sortButtons = null;
+
   get template() {
     return createSortTemplate();
   }
@@ -41,7 +43,12 @@ export default class SortView extends AbstractView {
       return;
     }
 
+    this.#sortButtons = this.element.querySelectorAll('.sort__button');
+    this.#sortButtons.forEach((sortButton) => sortButton.classList.remove('sort__button--active'))
+
+    console.log(evt.target);
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.dataset.sortType);
+    evt.target.classList.add('sort__button--active');
   }
 }

@@ -77,6 +77,7 @@ export default class FilmsSectionsPresenter {
   }
 
   #sortFilms = (sortType) => {
+
     switch (sortType) {
       case SortType.BY_DATE:
         this.#filmsInfo.sort((a, b) => b.filmInfo.release.date - a.filmInfo.release.date);
