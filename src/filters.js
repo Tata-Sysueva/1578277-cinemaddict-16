@@ -5,15 +5,15 @@ const initialFilters = {
 };
 
 export const generateFilters = (films) => films.reduce((acc, curFilm) => {
-  if (curFilm.watchlist) {
+  if (curFilm.userDetails.watchlist) {
     acc.watchlist++;
   }
 
-  if (curFilm.alreadyWatched) {
+  if (curFilm.userDetails.alreadyWatched) {
     acc.history++;
   }
 
-  if (curFilm.favorite) {
+  if (curFilm.userDetails.favorite) {
     acc.favorites++;
   }
 
