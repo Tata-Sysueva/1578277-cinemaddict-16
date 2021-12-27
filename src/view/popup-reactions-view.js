@@ -1,16 +1,10 @@
 import AbstractView from './abstract-view';
 
-const createPopupReactionsTemplate = (cardsFilms) => {
-  const {
-    watchlist,
-    alreadyWatched,
-    favorite,
-  } = cardsFilms;
-
-  return `<section class="film-details__controls">
+const createPopupReactionsTemplate = ({ userDetails }) => (
+  `<section class="film-details__controls">
     <button
        type="button"
-       class="film-details__control-button ${watchlist ? 'film-details__control-button--active' : ' '} film-details__control-button--watchlist"
+       class="film-details__control-button ${userDetails.watchlist ? 'film-details__control-button--active' : ' '} film-details__control-button--watchlist"
        id="watchlist"
        name="watchlist"
        >
@@ -18,7 +12,7 @@ const createPopupReactionsTemplate = (cardsFilms) => {
     </button>
     <button
        type="button"
-       class="film-details__control-button ${alreadyWatched ? 'film-details__control-button--active' : ' '} film-details__control-button--watched"
+       class="film-details__control-button ${userDetails.alreadyWatched ? 'film-details__control-button--active' : ' '} film-details__control-button--watched"
        id="watched"
        name="watched"
        >
@@ -26,14 +20,14 @@ const createPopupReactionsTemplate = (cardsFilms) => {
     </button>
     <button
        type="button"
-       class="film-details__control-button ${favorite ? 'film-details__control-button--active' : ' '} film-details__control-button--favorite"
+       class="film-details__control-button ${userDetails.favorite ? 'film-details__control-button--active' : ' '} film-details__control-button--favorite"
        id="favorite"
        name="favorite"
        >
         Add to favorites
     </button>
-  </section>`;
-};
+  </section>`
+);
 
 export default class PopupReactionsView extends AbstractView {
   #cardsFilms = null;

@@ -150,9 +150,10 @@ export const generateCardFilm = () => ({
     genres: createRandomArr(GENRES),
     description: getRandomArrayElement(DESCRIPTIONS),
   },
+  userDetails: {
     watchlist: Boolean(getRandomInteger(0, 1)),
     alreadyWatched: Boolean(getRandomInteger(0, 1)),
     watchingDate: generateDate(),
     favorite: Boolean(getRandomInteger(0, 1)),
-
+  }
 });
