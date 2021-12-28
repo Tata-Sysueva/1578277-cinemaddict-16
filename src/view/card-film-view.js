@@ -1,18 +1,8 @@
 import pluralize from 'pluralize';
 import AbstractView from './abstract-view';
-import PopupButtonCloseView from './popup-button-close-view';
-import {createElement} from '../render';
 
-const createCardFilm = (filmsInfo) => {
-  const {
-    comments,
-    filmInfo,
-    watchlist,
-    alreadyWatched,
-    favorite,
-  } = filmsInfo;
-
-  return `<article class="film-card">
+const createCardFilm = ({ comments, filmInfo, userDetails }) => (
+  `<article class="film-card">
     <a class="film-card__link">
       <h3 class="film-card__title">${filmInfo.title}</h3>
       <p class="film-card__rating">${filmInfo.totalRating}</p>
@@ -27,26 +17,26 @@ const createCardFilm = (filmsInfo) => {
     </a>
     <div class="film-card__controls">
       <button
-        class="film-card__controls-item ${watchlist ? 'film-card__controls-item--active' : ' '} film-card__controls-item--add-to-watchlist"
+        class="film-card__controls-item ${userDetails.watchlist ? 'film-card__controls-item--active' : ' '} film-card__controls-item--add-to-watchlist"
         type="button"
         >
         Add to watchlist
       </button>
       <button
-        class="film-card__controls-item ${alreadyWatched ? 'film-card__controls-item--active' : ' '} film-card__controls-item--mark-as-watched"
+        class="film-card__controls-item ${userDetails.alreadyWatched ? 'film-card__controls-item--active' : ' '} film-card__controls-item--mark-as-watched"
         type="button"
         >
         Mark as watched
       </button>
       <button
-        class="film-card__controls-item ${favorite ? 'film-card__controls-item--active' : ' '} film-card__controls-item--favorite"
+        class="film-card__controls-item ${userDetails.favorite ? 'film-card__controls-item--active' : ' '} film-card__controls-item--favorite"
         type="button"
         >
         Mark as favorite
       </button>
     </div>
-  </article>`;
-};
+  </article>`
+);
 
 export default class CardFilmView extends AbstractView {
   #filmInfo = null;
@@ -75,17 +65,20 @@ export default class CardFilmView extends AbstractView {
 
   setOnFilmWatchListClick = (callback) => {
     this._callback.watchedClick = callback;
-    this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#onWatchListClick);
+    this.element.querySelector('.film-card__controls-item--add-to-watchlist')
+      .addEventListener('click', this.#onWatchListClick);
   }
 
   setOnHistoryClick = (callback) => {
     this._callback.historyClick = callback;
-    this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#onHistoryClick);
+    this.element.querySelector('.film-card__controls-item--mark-as-watched')
+      .addEventListener('click', this.#onHistoryClick);
   }
 
   setOnFavoriteClick = (callback) => {
     this._callback.favoriteClick = callback;
-    this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#onFavoriteClick);
+    this.element.querySelector('.film-card__controls-item--favorite')
+      .addEventListener('click', this.#onFavoriteClick);
   }
 
   #onWatchListClick = (evt) => {

@@ -34,7 +34,7 @@ const isEscapeKey = (evt) => evt.key === 'Escape';
 const getSortedFilms = (films, sortType) => {
   switch (sortType) {
     case FilmsSortType.TOP_RATED:
-      return films.slice().sort((a, b) => b.rating - a.rating);
+      return films.slice().sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
     case FilmsSortType.MOST_COMMENTED:
       return films.slice().sort((a, b) => b.comments - a.comments);
     default:

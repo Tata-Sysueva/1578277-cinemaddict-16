@@ -1,6 +1,5 @@
 import ProfileView from './view/profile-view';
 import MenuView from './view/menu-view';
-import SortView from './view/sort-view';
 import FooterView from './view/footer-view';
 import {render} from './render.js';
 import {generateCardFilm} from './mock/film-card.js';
@@ -17,11 +16,10 @@ const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 
-const filmsSectionsPresenter = new FilmsSectionsPresenter(siteMainElement);
+render(siteHeaderElement, new ProfileView());
+render(siteMainElement, new MenuView(filters));
 
-render(siteHeaderElement, new ProfileView().element);
-render(siteMainElement, new MenuView(filters).element);
-render(siteMainElement, new SortView().element);
+const filmsSectionsPresenter = new FilmsSectionsPresenter(siteMainElement);
 
 render(siteFooterElement, new FooterView(generateCountFilms()));
 

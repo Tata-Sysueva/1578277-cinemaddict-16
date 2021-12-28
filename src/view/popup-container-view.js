@@ -65,20 +65,17 @@ export default class PopupContainerView extends AbstractView {
   }
 
   #onWatchListClick = (evt) => {
-    console.log('add to watch list');
     evt.preventDefault();
     this._callback.watchlistClick();
   }
 
   #onHistoryClick = (evt) => {
     evt.preventDefault();
-    console.log('add to watched');
     this._callback.historyClick();
   }
 
   #onFavoriteClick = (evt) => {
     evt.preventDefault();
-    console.log('add to favorite');
     this._callback.favoriteClick();
   }
 }
