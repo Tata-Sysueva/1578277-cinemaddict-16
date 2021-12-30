@@ -35,16 +35,12 @@ export default class CardFilmPresenter {
     remove(prevFilmComponent);
   }
 
-  #remove = () => {
-    remove(this.#filmComponent);
-  }
-
   #renderPopup = (film) => {
-    this.#popup = new PopupContainerView(film);
+    this.#popup = new PopupContainerView(film, this.#handleHistoryClick);
 
     this.#popup.setOnCloseButtonClick(this.#closePopup);
     this.#popup.setOnFilmWatchListClick(this.#handleAddWatchListClick);
-    this.#popup.setOnHistoryClick(this.#handleHistoryClick);
+    // this.#popup.setOnHistoryClick(this.#handleHistoryClick);
     this.#popup.setOnFavoriteClick(this.#handleFavoriteClick);
 
     render(document.body, this.#popup);
@@ -69,7 +65,7 @@ export default class CardFilmPresenter {
   }
 
   #handleHistoryClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, alreadyWatched: !this.#film.userDetails.alreadyWatched}});
+    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, alreadyWatched: !this.#film.userDetails.alreadyWatched},});
   }
 
   #handleFavoriteClick = () => {

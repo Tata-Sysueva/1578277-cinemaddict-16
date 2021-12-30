@@ -110,28 +110,8 @@ const generateDate = () => {
 };
 
 export const generateCardFilm = () => ({
-  // id: nanoid(),
-  // title: getRandomArrayElement(TITLES),
-  // rating: getFloatingPointNumber(),
-  // year: getRandomInteger(1900, 1980),
-  // duration: generateDuration(getRandomInteger(60, 300)),
-  // genre: getRandomArrayElement(GENRES),
-  // genres: createRandomArr(GENRES),
-  // image: getRandomArrayElement(IMAGES),
-  // description: getRandomArrayElement(DESCRIPTIONS),
-  // comments: createRandomArr(COMMENTS).length,
-  // age: getRandomArrayElement(AGES),
-  // director: getRandomArrayElement(DIRECTORS),
-  // actors: createRandomArr(ACTORS),
-  // writers: createRandomArr(WRITERS),
-  // country: getRandomArrayElement(COUNTRIES),
-  // date: generateDate(),
-  // watchlist: Boolean(getRandomInteger(0, 1)),
-  // alreadyWatched: Boolean(getRandomInteger(0, 1)),
-  // favorite: Boolean(getRandomInteger(0, 1)),
-
   id: nanoid(),
-  comments: createRandomArr(COMMENTS).length,
+  comments: createRandomArr(COMMENTS),
   filmInfo: {
     title: getRandomArrayElement(TITLES),
     alternativeTitle: getRandomArrayElement(TITLES),

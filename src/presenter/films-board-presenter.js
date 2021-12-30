@@ -2,10 +2,10 @@ import FilmsBoardView from '../view/films-board-view';
 import FilmsView from '../view/films-view';
 import ButtonShowMoreView from '../view/button-show-more';
 import {render, RenderPosition} from '../render.js';
-import {FilmsSortType, getSortedFilms, updateItem} from '../utils';
+import {SortType, getSortedFilms, updateItem} from '../utils';
 import CardFilmPresenter from './card-film-presenter';
 import FilmsContainerView from '../view/films-container-view';
-import SortView, {SortType} from '../view/sort-view';
+import SortView from '../view/sort-view';
 
 const CARDS_COUNT_PER_STEP = 5;
 
@@ -77,18 +77,7 @@ export default class FilmsSectionsPresenter {
   }
 
   #sortFilms = (sortType) => {
-
-    switch (sortType) {
-      case SortType.BY_DATE:
-        this.#filmsInfo.sort((a, b) => b.filmInfo.release.date - a.filmInfo.release.date);
-        break;
-      case SortType.BY_RATING:
-        this.#filmsInfo.sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
-        break;
-      default:
-        this.#filmsInfo = [...this.#sourcedFilmsInfo];
-    }
-
+    getSortedFilms(this.#filmsInfo, sortType, [...this.#sourcedFilmsInfo]);
     this.#currentSortType = sortType;
   }
 
@@ -160,11 +149,11 @@ export default class FilmsSectionsPresenter {
       // this.#renderFilmsSection(
       //   FilmsInfo.TOP_RATED.title,
       //   FilmsInfo.TOP_RATED.isExtra,
-      //   getSortedFilms(this.#filmsInfo, FilmsSortType.TOP_RATED).slice(from, to));
+      //   getSortedFilms(this.#filmsInfo, SortType.BY_RATING).slice(from, to)); // NB! убрала slice из getSortedFilms
       // this.#renderFilmsSection(
       //   FilmsInfo.MOST_COMMENTED.title,
       //   FilmsInfo.MOST_COMMENTED.isExtra,
-      //   getSortedFilms(this.#filmsInfo, FilmsSortType.MOST_COMMENTED).slice(from, to));
+      //   getSortedFilms(this.#filmsInfo, SortType.BY_COMMENTED).slice(from, to));
     } else {
       this.#renderEmptySection(FilmsInfo.EMPTY_ALL.title, FilmsInfo.EMPTY_ALL.isExtra);
     }

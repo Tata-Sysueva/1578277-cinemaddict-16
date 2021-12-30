@@ -1,4 +1,4 @@
-import AbstractView from './abstract-view';
+import SmartView from './smart-view';
 
 const createPopupReactionsTemplate = ({ userDetails }) => (
   `<section class="film-details__controls">
@@ -29,15 +29,39 @@ const createPopupReactionsTemplate = ({ userDetails }) => (
   </section>`
 );
 
-export default class PopupReactionsView extends AbstractView {
-  #cardsFilms = null;
+export default class PopupReactionsView extends SmartView {
+  #callback = null;
 
-  constructor(cardsFilms) {
+  constructor(films, callback) {
     super();
-    this.#cardsFilms = cardsFilms;
+    this.#callback = callback;
+    this._data = PopupReactionsView.parseFilmsToData(films);
+    this.#setInnerHandlers(callback);
   }
 
   get template() {
-    return createPopupReactionsTemplate(this.#cardsFilms);
+    return createPopupReactionsTemplate(this._data);
   }
+
+  restoreHandlers = () => {
+    this.#setInnerHandlers(this.#callback);
+  }
+
+  #setInnerHandlers = (callback) => {
+    this._callback.historyClick = callback;
+    this.element.querySelector('.film-details__control-button--watched')
+      .addEventListener('click', this.#onHistoryClick);
+  }
+
+  #onHistoryClick = (evt) => {
+    evt.preventDefault();
+    this._callback.historyClick();
+    this.updateData({
+      userDetails: {...this._data.userDetails, alreadyWatched: !this._data.userDetails.alreadyWatched}
+    })
+  };
+
+  static parseFilmsToData = (film) => ({...film,
+    userDetails: {...film.userDetails, alreadyWatched: film.userDetails.alreadyWatched}
+  });
 }

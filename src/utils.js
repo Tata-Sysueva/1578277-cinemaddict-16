@@ -1,6 +1,8 @@
-const FilmsSortType = {
-  TOP_RATED: 'Top rated',
-  MOST_COMMENTED: 'Most commented',
+export const SortType = {
+  DEFAULT: 'default',
+  BY_DATE: 'date',
+  BY_RATING: 'rating',
+  BY_COMMENTED: 'most commented',
 };
 
 const getRandomInteger = (a = 0, b = 1) => {
@@ -31,14 +33,16 @@ const uppercaseFirstLetter = (string) => string.slice(0,1).toUpperCase() + strin
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
-const getSortedFilms = (films, sortType) => {
+const getSortedFilms = (films, sortType, sourcedFilms) => {
   switch (sortType) {
-    case FilmsSortType.TOP_RATED:
-      return films.slice().sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
-    case FilmsSortType.MOST_COMMENTED:
-      return films.slice().sort((a, b) => b.comments - a.comments);
+    case SortType.BY_COMMENTED:
+      return films.slice().sort((a, b) => b.comments.length - a.comments.length);
+    case SortType.BY_DATE:
+      return films.sort((a, b) => b.filmInfo.release.date - a.filmInfo.release.date);
+    case SortType.BY_RATING:
+      return films.sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
     default:
-      throw new Error(`Unknown sort type ${sortType}`);
+      films = sourcedFilms;
   }
 };
 
@@ -63,7 +67,6 @@ export {
   createRandomArr,
   uppercaseFirstLetter,
   isEscapeKey,
-  FilmsSortType,
   getSortedFilms,
   updateItem,
 };

@@ -1,4 +1,4 @@
-import AbstractView from './abstract-view';
+import SmartView from './smart-view';
 
 const createNewComment = () => (
   `<div class="film-details__new-comment">
@@ -32,8 +32,40 @@ const createNewComment = () => (
   </div>`
 );
 
-export default class NewCommentView extends AbstractView {
+export default class NewCommentView extends SmartView {
+  constructor() {
+    super();
+    this.#setInnerHandlers();
+  }
+
   get template() {
     return createNewComment();
+  }
+
+  restoreHandlers = () => {
+    this.#setInnerHandlers();
+  }
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('#emoji-smile')
+      .addEventListener('click', this.#emojiToggleHandler);
+    this.element.querySelector('#emoji-sleeping')
+      .addEventListener('click', this.#emojiToggleHandler);
+    this.element.querySelector('#emoji-puke')
+      .addEventListener('click', this.#emojiToggleHandler);
+    this.element.querySelector('#emoji-angry')
+      .addEventListener('click', this.#emojiToggleHandler);
+  }
+
+  #emojiToggleHandler = (evt) => {
+    const emoji = evt.target.id.replace('emoji-','');
+    const newEmoji = `<img src="./images/emoji/${emoji}.png" width="55" height="55" alt="${evt.target.id}">`;
+    const emojiContainer = this.element.querySelector('.film-details__add-emoji-label');
+
+    if (emojiContainer.firstChild) {
+      emojiContainer.removeChild(emojiContainer.firstChild);
+    }
+
+    emojiContainer.insertAdjacentHTML('beforeend', newEmoji);
   }
 }

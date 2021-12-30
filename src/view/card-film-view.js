@@ -13,7 +13,7 @@ const createCardFilm = ({ comments, filmInfo, userDetails }) => (
       </p>
       <img src="./images/posters/${filmInfo.poster}" alt="${filmInfo.title}" class="film-card__poster">
       <p class="film-card__description">${filmInfo.description}</p>
-      <span class="film-card__comments">${comments} ${pluralize('comment', comments)}</span>
+      <span class="film-card__comments">${comments.length} ${pluralize('comment', comments.length)}</span>
     </a>
     <div class="film-card__controls">
       <button
