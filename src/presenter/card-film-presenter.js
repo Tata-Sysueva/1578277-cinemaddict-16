@@ -36,12 +36,12 @@ export default class CardFilmPresenter {
   }
 
   #renderPopup = (film) => {
-    this.#popup = new PopupContainerView(film, this.#handleHistoryClick);
+    this.#popup = new PopupContainerView(film, this.#handleControlsClick);
 
     this.#popup.setOnCloseButtonClick(this.#closePopup);
-    this.#popup.setOnFilmWatchListClick(this.#handleAddWatchListClick);
+    //this.#popup.setOnFilmWatchListClick(this.#handleAddWatchListClick);
     // this.#popup.setOnHistoryClick(this.#handleHistoryClick);
-    this.#popup.setOnFavoriteClick(this.#handleFavoriteClick);
+    // this.#popup.setOnFavoriteClick(this.#handleFavoriteClick);
 
     render(document.body, this.#popup);
     document.body.classList.add('hide-overflow');
@@ -58,6 +58,10 @@ export default class CardFilmPresenter {
     if (isEscapeKey(evt)) {
       this.#closePopup();
     }
+  }
+
+  #handleControlsClick = (updatedDetails) => {
+    this.#changeData({...this.#film, userDetails: {...updatedDetails}});
   }
 
   #handleAddWatchListClick = () => {

@@ -1,6 +1,12 @@
 import SmartView from './smart-view';
 
-const createPopupReactionsTemplate = ({ userDetails }) => (
+const CONTROL_TYPES = {
+  watchlist: 'watchlist',
+  watched: 'watched',
+  favorite: 'favorite',
+};
+
+const createPopupReactionsTemplate = (userDetails) => (
   `<section class="film-details__controls">
     <button
        type="button"
@@ -32,10 +38,10 @@ const createPopupReactionsTemplate = ({ userDetails }) => (
 export default class PopupReactionsView extends SmartView {
   #callback = null;
 
-  constructor(films, callback) {
+  constructor(filmDetails, callback) {
     super();
     this.#callback = callback;
-    this._data = PopupReactionsView.parseFilmsToData(films);
+    this._data = PopupReactionsView.parseFilmsToData(filmDetails);
     this.#setInnerHandlers(callback);
   }
 
@@ -48,20 +54,39 @@ export default class PopupReactionsView extends SmartView {
   }
 
   #setInnerHandlers = (callback) => {
-    this._callback.historyClick = callback;
-    this.element.querySelector('.film-details__control-button--watched')
-      .addEventListener('click', this.#onHistoryClick);
+    this._callback.controlsClick = callback;
+    this.element.addEventListener('click', this.#onControlsClick);
   }
 
-  #onHistoryClick = (evt) => {
+  #onControlsClick = (evt) => {
     evt.preventDefault();
-    this._callback.historyClick();
+
+    if (!evt.target.closest('.film-details__control-button')) {
+      return;
+    }
+
+    this._callback.controlsClick();
+
+    switch (evt.target.id) {
+      case CONTROL_TYPES.watchlist:
+        this._data = {...this._data, watchlist: !this._data.watchlist};
+        break;
+      case CONTROL_TYPES.watched:
+        this._data = {...this._data, alreadyWatched: !this._data.alreadyWatched};
+        break;
+      case CONTROL_TYPES.favorite:
+        this._data = {...this._data, favorite: !this._data.favorite};
+        break;
+      default:
+        this._data = {...this._data};
+    }
+
     this.updateData({
-      userDetails: {...this._data.userDetails, alreadyWatched: !this._data.userDetails.alreadyWatched}
-    })
+      userDetails: {...this._data}
+    });
+
+    this._callback.controlsClick(this._data);
   };
 
-  static parseFilmsToData = (film) => ({...film,
-    userDetails: {...film.userDetails, alreadyWatched: film.userDetails.alreadyWatched}
-  });
+  static parseFilmsToData = (filmDetails) => ({...filmDetails});
 }

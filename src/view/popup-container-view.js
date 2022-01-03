@@ -1,7 +1,7 @@
 import {render} from '../render';
 import PopupButtonCloseView from './popup-button-close-view';
 import PopupFilmInfoView from './popup-film-info-view';
-import PopupReactionsView from './popup-reactions-view';
+import PopupControlsView from './popup-controls-view';
 import CommentsContainerView from './popup-comments-view';
 import NewCommentView from './new-comment-view';
 import SmartView from './smart-view';
@@ -20,7 +20,7 @@ export default class PopupContainerView extends SmartView {
   #topContainer = null;
   #bottomContainer = null;
 
-  constructor(film, callback) {
+  constructor(film, controlsCallback) {
     super();
     this.#film = film;
 
@@ -29,7 +29,7 @@ export default class PopupContainerView extends SmartView {
 
     render(this.#topContainer, new PopupButtonCloseView());
     render(this.#topContainer, new PopupFilmInfoView(this.#film));
-    render(this.#topContainer, new PopupReactionsView(this.#film, callback));
+    render(this.#topContainer, new PopupControlsView(this.#film.userDetails, controlsCallback));
 
     render(this.#bottomContainer, new CommentsContainerView());
     render(this.#bottomContainer, new NewCommentView());
@@ -47,38 +47,8 @@ export default class PopupContainerView extends SmartView {
   #onCloseButtonClick = (evt) => {
     evt.preventDefault();
     this._callback.click();
-  }
-
-  setOnFilmWatchListClick = (callback) => {
-    this._callback.watchlistClick = callback;
-    this.element.querySelector('.film-details__control-button--watchlist')
-      .addEventListener('click', this.#onWatchListClick);
-  }
-
-  // setOnHistoryClick = (callback) => {
-  //   this._callback.historyClick = callback;
-  //   this.element.querySelector('.film-details__control-button--watched')
-  //     .addEventListener('click', this.#onHistoryClick);
-  // }
-
-  setOnFavoriteClick = (callback) => {
-    this._callback.favoriteClick = callback;
-    this.element.querySelector('.film-details__control-button--favorite')
-      .addEventListener('click', this.#onFavoriteClick);
-  }
-
-  #onWatchListClick = (evt) => {
-    evt.preventDefault();
-    this._callback.watchlistClick();
-  }
-
-  #onHistoryClick = (evt) => {
-    evt.preventDefault();
-    this._callback.historyClick();
-  }
-
-  #onFavoriteClick = (evt) => {
-    evt.preventDefault();
-    this._callback.favoriteClick();
+    this.#film = null;
+    this.#topContainer = null;
+    this.#bottomContainer = null;
   }
 }
