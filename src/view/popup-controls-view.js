@@ -65,8 +65,6 @@ export default class PopupReactionsView extends SmartView {
       return;
     }
 
-    this._callback.controlsClick();
-
     switch (evt.target.id) {
       case CONTROL_TYPES.watchlist:
         this._data = {...this._data, watchlist: !this._data.watchlist};

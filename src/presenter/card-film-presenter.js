@@ -20,11 +20,7 @@ export default class CardFilmPresenter {
 
     const prevFilmComponent = this.#filmComponent;
 
-    this.#filmComponent = new CardFilmView(film);
-
-    this.#filmComponent.setOnFilmWatchListClick(this.#handleAddWatchListClick);
-    this.#filmComponent.setOnHistoryClick(this.#handleHistoryClick);
-    this.#filmComponent.setOnFavoriteClick(this.#handleFavoriteClick);
+    this.#filmComponent = new CardFilmView(film, this.#handleControlsClick);
     this.#filmComponent.setOnPopupClick(() => this.#renderPopup(film));
 
     if (prevFilmComponent === null) {
@@ -39,9 +35,6 @@ export default class CardFilmPresenter {
     this.#popup = new PopupContainerView(film, this.#handleControlsClick);
 
     this.#popup.setOnCloseButtonClick(this.#closePopup);
-    //this.#popup.setOnFilmWatchListClick(this.#handleAddWatchListClick);
-    // this.#popup.setOnHistoryClick(this.#handleHistoryClick);
-    // this.#popup.setOnFavoriteClick(this.#handleFavoriteClick);
 
     render(document.body, this.#popup);
     document.body.classList.add('hide-overflow');
@@ -62,17 +55,5 @@ export default class CardFilmPresenter {
 
   #handleControlsClick = (updatedDetails) => {
     this.#changeData({...this.#film, userDetails: {...updatedDetails}});
-  }
-
-  #handleAddWatchListClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, watchlist: !this.#film.userDetails.watchlist}});
-  }
-
-  #handleHistoryClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, alreadyWatched: !this.#film.userDetails.alreadyWatched},});
-  }
-
-  #handleFavoriteClick = () => {
-    this.#changeData({...this.#film, userDetails: {...this.#film.userDetails, favorite: !this.#film.userDetails.favorite}});
   }
 }
