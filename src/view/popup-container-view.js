@@ -1,10 +1,10 @@
 import {render} from '../render';
 import PopupButtonCloseView from './popup-button-close-view';
 import PopupFilmInfoView from './popup-film-info-view';
-import PopupReactionsView from './popup-reactions-view';
+import PopupControlsView from './popup-controls-view';
 import CommentsContainerView from './popup-comments-view';
 import NewCommentView from './new-comment-view';
-import AbstractView from './abstract-view';
+import SmartView from './smart-view';
 
 const createPopupTemplate = () => (
   `<section class="film-details">
@@ -15,12 +15,12 @@ const createPopupTemplate = () => (
   </section>`
 );
 
-export default class PopupContainerView extends AbstractView {
+export default class PopupContainerView extends SmartView {
   #film = null;
   #topContainer = null;
   #bottomContainer = null;
 
-  constructor(film) {
+  constructor(film, controlsCallback) {
     super();
     this.#film = film;
 
@@ -29,7 +29,7 @@ export default class PopupContainerView extends AbstractView {
 
     render(this.#topContainer, new PopupButtonCloseView());
     render(this.#topContainer, new PopupFilmInfoView(this.#film));
-    render(this.#topContainer, new PopupReactionsView(this.#film));
+    render(this.#topContainer, new PopupControlsView(this.#film.userDetails, controlsCallback));
 
     render(this.#bottomContainer, new CommentsContainerView());
     render(this.#bottomContainer, new NewCommentView());
@@ -47,35 +47,8 @@ export default class PopupContainerView extends AbstractView {
   #onCloseButtonClick = (evt) => {
     evt.preventDefault();
     this._callback.click();
-  }
-
-  setOnFilmWatchListClick = (callback) => {
-    this._callback.watchlistClick = callback;
-    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#onWatchListClick);
-  }
-
-  setOnHistoryClick = (callback) => {
-    this._callback.historyClick = callback;
-    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#onHistoryClick);
-  }
-
-  setOnFavoriteClick = (callback) => {
-    this._callback.favoriteClick = callback;
-    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#onFavoriteClick);
-  }
-
-  #onWatchListClick = (evt) => {
-    evt.preventDefault();
-    this._callback.watchlistClick();
-  }
-
-  #onHistoryClick = (evt) => {
-    evt.preventDefault();
-    this._callback.historyClick();
-  }
-
-  #onFavoriteClick = (evt) => {
-    evt.preventDefault();
-    this._callback.favoriteClick();
+    this.#film = null;
+    this.#topContainer = null;
+    this.#bottomContainer = null;
   }
 }

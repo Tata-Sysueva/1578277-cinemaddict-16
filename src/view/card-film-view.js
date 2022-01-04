@@ -1,5 +1,6 @@
 import pluralize from 'pluralize';
 import AbstractView from './abstract-view';
+import SmartView from './smart-view';
 
 const createCardFilm = ({ comments, filmInfo, userDetails }) => (
   `<article class="film-card">
@@ -13,7 +14,7 @@ const createCardFilm = ({ comments, filmInfo, userDetails }) => (
       </p>
       <img src="./images/posters/${filmInfo.poster}" alt="${filmInfo.title}" class="film-card__poster">
       <p class="film-card__description">${filmInfo.description}</p>
-      <span class="film-card__comments">${comments} ${pluralize('comment', comments)}</span>
+      <span class="film-card__comments">${comments.length} ${pluralize('comment', comments.length)}</span>
     </a>
     <div class="film-card__controls">
       <button
@@ -38,16 +39,24 @@ const createCardFilm = ({ comments, filmInfo, userDetails }) => (
   </article>`
 );
 
-export default class CardFilmView extends AbstractView {
+export default class CardFilmView extends SmartView {
   #filmInfo = null;
+  #callback = null;
 
-  constructor(filmInfo) {
+  constructor(filmInfo, callbackControls) {
     super();
     this.#filmInfo = filmInfo;
+    this.#callback = callbackControls;
+    this._data = CardFilmView.parseFilmsToData(filmInfo);
+    this.#setOnFilmControlsClick(callbackControls);
   }
 
   get template() {
-    return createCardFilm(this.#filmInfo);
+    return createCardFilm(this._data);
+  }
+
+  restoreHandlers = () => {
+    this.#setOnFilmControlsClick(this.#callback);
   }
 
   setOnPopupClick = (callback) => {
@@ -63,36 +72,38 @@ export default class CardFilmView extends AbstractView {
     }
   }
 
-  setOnFilmWatchListClick = (callback) => {
-    this._callback.watchedClick = callback;
-    this.element.querySelector('.film-card__controls-item--add-to-watchlist')
-      .addEventListener('click', this.#onWatchListClick);
+  #setOnFilmControlsClick = (callbackControls) => {
+    this._callback.controlsClick = callbackControls;
+    this.element.addEventListener('click', this.#onControlsClick);
   }
 
-  setOnHistoryClick = (callback) => {
-    this._callback.historyClick = callback;
-    this.element.querySelector('.film-card__controls-item--mark-as-watched')
-      .addEventListener('click', this.#onHistoryClick);
-  }
-
-  setOnFavoriteClick = (callback) => {
-    this._callback.favoriteClick = callback;
-    this.element.querySelector('.film-card__controls-item--favorite')
-      .addEventListener('click', this.#onFavoriteClick);
-  }
-
-  #onWatchListClick = (evt) => {
+  #onControlsClick = (evt) => {
     evt.preventDefault();
-    this._callback.watchedClick();
+
+    if (!evt.target.closest('.film-card__controls-item')) {
+      return;
+    }
+
+    switch (evt.target) {
+      case evt.target.closest('.film-card__controls-item--add-to-watchlist'):
+        this._data = {...this._data, watchlist: !this._data.watchlist};
+        break;
+      case evt.target.closest('.film-card__controls-item--mark-as-watched'):
+        this._data = {...this._data, alreadyWatched: !this._data.alreadyWatched};
+        break;
+      case evt.target.closest('.film-card__controls-item--favorite'):
+        this._data = {...this._data, favorite: !this._data.favorite};
+        break;
+      default:
+        this._data = {...this._data};
+    }
+
+    this.updateData({
+      userDetails: {...this._data}
+    });
+
+    this._callback.controlsClick(this._data);
   }
 
-  #onHistoryClick = (evt) => {
-    evt.preventDefault();
-    this._callback.historyClick();
-  }
-
-  #onFavoriteClick = (evt) => {
-    evt.preventDefault();
-    this._callback.favoriteClick();
-  }
+  static parseFilmsToData = (filmDetails) => ({...filmDetails});
 }
