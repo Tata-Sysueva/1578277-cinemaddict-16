@@ -1,9 +1,9 @@
 import SmartView from './smart-view';
 
-const CONTROL_TYPES = {
-  watchlist: 'watchlist',
-  watched: 'watched',
-  favorite: 'favorite',
+const ControlType = {
+  WATCHLIST: 'watchlist',
+  WATCHED: 'watched',
+  FAVORITE: 'favorite',
 };
 
 const createPopupReactionsTemplate = (userDetails) => (
@@ -50,11 +50,10 @@ export default class PopupReactionsView extends SmartView {
   }
 
   restoreHandlers = () => {
-    this.#setInnerHandlers(this.#callback);
+    this.#setInnerHandlers();
   }
 
-  #setInnerHandlers = (callback) => {
-    this._callback.controlsClick = callback;
+  #setInnerHandlers = () => {
     this.element.addEventListener('click', this.#onControlsClick);
   }
 
@@ -66,13 +65,13 @@ export default class PopupReactionsView extends SmartView {
     }
 
     switch (evt.target.id) {
-      case CONTROL_TYPES.watchlist:
+      case ControlType.WATCHLIST:
         this._data = {...this._data, watchlist: !this._data.watchlist};
         break;
-      case CONTROL_TYPES.watched:
+      case ControlType.WATCHED:
         this._data = {...this._data, alreadyWatched: !this._data.alreadyWatched};
         break;
-      case CONTROL_TYPES.favorite:
+      case ControlType.FAVORITE:
         this._data = {...this._data, favorite: !this._data.favorite};
         break;
       default:
@@ -83,7 +82,7 @@ export default class PopupReactionsView extends SmartView {
       userDetails: {...this._data}
     });
 
-    this._callback.controlsClick(this._data);
+    this.#callback(this._data);
   };
 
   static parseFilmsToData = (filmDetails) => ({...filmDetails});

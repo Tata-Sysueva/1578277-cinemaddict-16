@@ -40,7 +40,7 @@ const createNewComment = ({ text, emotion }) => (
       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${text}</textarea>
     </label>
 
-  ${createEmojiList(emotion)}
+    ${createEmojiList(emotion)}
   </div>`
 );
 
@@ -76,7 +76,6 @@ export default class NewCommentView extends SmartView {
   }
 
   #descriptionInputHandler = (evt) => {
-    evt.preventDefault();
     this.updateData({
       text: evt.target.value,
     }, true);

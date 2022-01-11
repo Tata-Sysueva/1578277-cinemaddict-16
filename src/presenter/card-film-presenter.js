@@ -2,6 +2,7 @@ import CardFilmView from '../view/card-film-view';
 import {remove, render, replace} from '../render';
 import PopupContainerView from '../view/popup-container-view';
 import {isEscapeKey} from '../utils';
+import {UpdateType} from '../const.js';
 
 export default class CardFilmPresenter {
   #container = null;
@@ -20,7 +21,8 @@ export default class CardFilmPresenter {
 
     const prevFilmComponent = this.#filmComponent;
 
-    this.#filmComponent = new CardFilmView(film, this.#handleControlsClick);
+    this.#filmComponent = new CardFilmView(film);
+    this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick);
     this.#filmComponent.setOnPopupClick(() => this.#renderPopup(film));
 
     if (prevFilmComponent === null) {
@@ -29,6 +31,10 @@ export default class CardFilmPresenter {
       replace(this.#filmComponent, prevFilmComponent);
     }
     remove(prevFilmComponent);
+  }
+
+  clear = () => {
+
   }
 
   #renderPopup = (film) => {
@@ -54,6 +60,15 @@ export default class CardFilmPresenter {
   }
 
   #handleControlsClick = (updatedDetails) => {
-    this.#changeData({...this.#film, userDetails: {...updatedDetails}});
+    this.#changeData(
+      UpdateType.PATCH,
+      {...this.#film, userDetails: {...updatedDetails}});
+  }
+
+  #handleControlsFilmsClick = (updatedDetails) => {
+    this.#changeData(
+      UpdateType.PATCH,
+      {...this.#film, ...updatedDetails},
+    );
   }
 }
