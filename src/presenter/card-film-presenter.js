@@ -3,6 +3,8 @@ import {remove, render, replace} from '../render';
 import PopupContainerView from '../view/popup-container-view';
 import {isEscapeKey} from '../utils';
 import {UpdateType} from '../const.js';
+import CommentsModel from '../model/comments-model';
+import {getCommentArray} from '../mock/comment';
 
 export default class CardFilmPresenter {
   #container = null;
@@ -10,10 +12,14 @@ export default class CardFilmPresenter {
   #filmComponent = null;
   #popup = null;
   #changeData = null;
+  #filterType = null;
+  #commentsModel = null;
+  #comments = null;
 
-  constructor(container, changeData) {
+  constructor(container, changeData, filterType) {
     this.#container = container;
     this.#changeData = changeData;
+    this.#filterType = filterType;
   }
 
   init = (film) => {
@@ -22,8 +28,13 @@ export default class CardFilmPresenter {
     const prevFilmComponent = this.#filmComponent;
 
     this.#filmComponent = new CardFilmView(film);
-    this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick);
-    this.#filmComponent.setOnPopupClick(() => this.#renderPopup(film));
+    this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick)
+
+    this.#comments = getCommentArray();
+    this.#commentsModel = new CommentsModel();
+    this.#commentsModel.comments = this.#comments;
+
+    this.#filmComponent.setOnPopupClick(() => this.#renderPopup(film, this.#comments));
 
     if (prevFilmComponent === null) {
       render(this.#container, this.#filmComponent);
@@ -33,12 +44,8 @@ export default class CardFilmPresenter {
     remove(prevFilmComponent);
   }
 
-  clear = () => {
-
-  }
-
-  #renderPopup = (film) => {
-    this.#popup = new PopupContainerView(film, this.#handleControlsClick);
+  #renderPopup = (film, comments) => {
+    this.#popup = new PopupContainerView(film, this.#handleControlsClick, comments);
 
     this.#popup.setOnCloseButtonClick(this.#closePopup);
 
@@ -59,15 +66,19 @@ export default class CardFilmPresenter {
     }
   }
 
-  #handleControlsClick = (updatedDetails) => {
+  #handleViewAction = (updateType, date) => {
+    this.#comments.addComment(updateType, date);
+  }
+
+  #handleControlsClick = (updatedDetails, userAction) => {
     this.#changeData(
-      UpdateType.PATCH,
+      userAction === this.#filterType ? UpdateType.MINOR : UpdateType.PATCH,
       {...this.#film, userDetails: {...updatedDetails}});
   }
 
-  #handleControlsFilmsClick = (updatedDetails) => {
+  #handleControlsFilmsClick = (updatedDetails, userAction) => {
     this.#changeData(
-      UpdateType.PATCH,
+      userAction === this.#filterType ? UpdateType.MINOR : UpdateType.PATCH,
       {...this.#film, ...updatedDetails},
     );
   }

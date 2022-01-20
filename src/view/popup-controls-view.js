@@ -1,4 +1,5 @@
 import SmartView from './smart-view';
+import {FilterType} from '../const';
 
 const ControlType = {
   WATCHLIST: 'watchlist',
@@ -37,6 +38,7 @@ const createPopupReactionsTemplate = (userDetails) => (
 
 export default class PopupReactionsView extends SmartView {
   #callback = null;
+  #userAction = null;
 
   constructor(filmDetails, callback) {
     super();
@@ -66,12 +68,15 @@ export default class PopupReactionsView extends SmartView {
 
     switch (evt.target.id) {
       case ControlType.WATCHLIST:
+        this.#userAction = FilterType.WATCHLIST;
         this._data = {...this._data, watchlist: !this._data.watchlist};
         break;
       case ControlType.WATCHED:
+        this.#userAction = FilterType.HISTORY;
         this._data = {...this._data, alreadyWatched: !this._data.alreadyWatched};
         break;
       case ControlType.FAVORITE:
+        this.#userAction = FilterType.FAVORITES;
         this._data = {...this._data, favorite: !this._data.favorite};
         break;
       default:
@@ -82,7 +87,7 @@ export default class PopupReactionsView extends SmartView {
       userDetails: {...this._data}
     });
 
-    this.#callback(this._data);
+    this.#callback(this._data, this.#userAction);
   };
 
   static parseFilmsToData = (filmDetails) => ({...filmDetails});

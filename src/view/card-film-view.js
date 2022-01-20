@@ -1,5 +1,6 @@
 import pluralize from 'pluralize';
 import AbstractView from './abstract-view';
+import {FilterType} from '../const';
 
 const createCardFilm = ({ comments, filmInfo, userDetails }) => (
   `<article class="film-card">
@@ -78,7 +79,7 @@ export default class CardFilmView extends AbstractView {
 
     switch (evt.target) {
       case evt.target.closest('.film-card__controls-item--add-to-watchlist'):
-        //this.#userAction = UserAction.ADD_FILM_TO_WATCHLIST;
+        this.#userAction = FilterType.WATCHLIST;
         this.#filmInfo = {...this.#filmInfo,
           userDetails: {
             ...this.#filmInfo.userDetails,
@@ -87,7 +88,7 @@ export default class CardFilmView extends AbstractView {
         };
         break;
       case evt.target.closest('.film-card__controls-item--mark-as-watched'):
-        //this.#userAction = UserAction.MARK_FILM_AS_WATCHED;
+        this.#userAction = FilterType.HISTORY;
         this.#filmInfo = {...this.#filmInfo,
           userDetails: {
             ...this.#filmInfo.userDetails,
@@ -96,7 +97,7 @@ export default class CardFilmView extends AbstractView {
         };
         break;
       case evt.target.closest('.film-card__controls-item--favorite'):
-        //this.#userAction = UserAction.MARK_FILM_AS_FAVORITE;
+        this.#userAction = FilterType.FAVORITES;
         this.#filmInfo = {...this.#filmInfo,
           userDetails: {
             ...this.#filmInfo.userDetails,

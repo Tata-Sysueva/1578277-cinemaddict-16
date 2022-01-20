@@ -1,4 +1,6 @@
 import SmartView from './smart-view';
+import {UpdateType, UserAction} from '../const';
+import {getRandomInteger} from '../utils';
 
 const EMOJIS = [
   'smile',
@@ -80,6 +82,25 @@ export default class NewCommentView extends SmartView {
       text: evt.target.value,
     }, true);
   }
+
+  // setCommentAddHandler = () => {
+  //   this.element.addEventListener('keydown', this.#handleCommentAdd);
+  // }
+  //
+  // #handleCommentAdd = (evt) => {
+  //   //проверять событие клавиатуры
+  //   this.#changeData(
+  //     UserAction.ADD_COMMENT,
+  //     UpdateType.MINOR,
+  //     {
+  //       id: getRandomInteger(10, 20), ...this.#commentsInfo,
+  //       author: 'Me',
+  //       comment: this.element.querySelector('.film-details__comment-input').value,
+  //       date: 'now',
+  //       emotion: this.#emojiClickHandler,
+  //     },
+  //   );
+  //}
 
   static parseCommentToDate = (data) => ({...data})
 }

@@ -2,11 +2,11 @@ import FilmsBoardView from '../view/films-board-view';
 import FilmsView from '../view/films-view';
 import ButtonShowMoreView from '../view/button-show-more';
 import {render, RenderPosition} from '../render.js';
-import {SortType, SortFilmsComments, SortFilmsRelease, SortFilmsRating} from '../utils';
+import {SortType, SortFilmsComments, SortFilmsRelease, SortFilmsRating, getSortedFilms} from '../utils';
 import CardFilmPresenter from './card-film-presenter';
 import FilmsContainerView from '../view/films-container-view';
 import SortView from '../view/sort-view';
-import {FilmsInfo, UpdateType} from '../const';
+import {FilmsInfo, FilterType, UpdateType} from '../const';
 import {filter} from '../filters';
 
 const CARDS_COUNT_PER_STEP = 5;
@@ -43,10 +43,7 @@ export default class FilmsSectionsPresenter {
     const films = this.#filmsModel.films;
     const filteredFilms = filter[filterType](films);
 
-
     switch (this.#currentSortType) {
-      case SortType.BY_COMMENTED:
-        return filteredFilms.sort(SortFilmsComments);
       case SortType.BY_DATE:
         return filteredFilms.sort(SortFilmsRelease);
       case SortType.BY_RATING:
@@ -105,9 +102,7 @@ export default class FilmsSectionsPresenter {
   #clearBoard = ({resetRenderedFilmCount = false, resetSortType = false} = {}) => {
     const filmsCount = this.films.length;
 
-    while (this.#filmsContainer.firstChild) {
-      this.#filmsContainer.removeChild(this.#filmsContainer.firstChild);
-    }
+    this.#filmsContainer.innerHTML = ' ';
 
     this.#showMoreButton.element.remove();
 
@@ -140,7 +135,7 @@ export default class FilmsSectionsPresenter {
   }
 
   #renderCard = (film) => {
-    const cardFilmPresenter = new CardFilmPresenter(this.#filmsContainer, this.#handleViewAction);
+    const cardFilmPresenter = new CardFilmPresenter(this.#filmsContainer, this.#handleViewAction, this.#filterModel.filter);
     cardFilmPresenter.init(film);
     this.#cardFilmPresenter.set(film.id, cardFilmPresenter);
   }
@@ -183,11 +178,11 @@ export default class FilmsSectionsPresenter {
       // this.#renderFilmsSection(
       //   FilmsInfo.TOP_RATED.title,
       //   FilmsInfo.TOP_RATED.isExtra,
-      //   getSortedFilms(this.#filmsInfo, SortType.BY_RATING).slice(from, to)); // NB! убрала slice из getSortedFilms
+      //   getSortedFilms(this.films, SortType.BY_RATING).slice(from, to)); // NB! убрала slice из getSortedFilms
       // this.#renderFilmsSection(
       //   FilmsInfo.MOST_COMMENTED.title,
       //   FilmsInfo.MOST_COMMENTED.isExtra,
-      //   getSortedFilms(this.#filmsInfo, SortType.BY_COMMENTED).slice(from, to));
+      //   getSortedFilms(this.films, SortType.BY_COMMENTED).slice(from, to));
     } else {
       this.#renderEmptySection(FilmsInfo.EMPTY_ALL.title, FilmsInfo.EMPTY_ALL.isExtra);
     }
