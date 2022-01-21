@@ -62,6 +62,8 @@ export const unique = (arr) => {
   return result;
 };
 
+export const makeItemsUniq = (items) => [...new Set(items)];
+
 export const getValues = (array, commentId) => {
   return array.filter((commentInfo) => commentInfo.id === commentId);
 }
@@ -75,21 +77,16 @@ dayjs.extend(isSameOrBefore);
 
 export const countCompletedFilmInDateRange = (films, dateFrom, dateTo) =>
   films.reduce((counter, film) => {
-    if (film.userDetails.watchingDate === null) {
+    const { watchingDate } = film.userDetails;
+
+    if (watchingDate === null) {
       return counter;
     }
 
-    // const { watchingDate } = film.userDetails;
-    // if (watchingDate === null) {
-    //   return counter;
-    // }
-
-    // С помощью day.js проверям, сколько задач с дедлайном
-    // попадают в диапазон дат
     if (
-      dayjs(film.userDetails.watchingDate).isSame(dateFrom) ||
-      dayjs(film.userDetails.watchingDate).isBetween(dateFrom, dateTo) ||
-      dayjs(film.userDetails.watchingDate).isSame(dateTo)
+      dayjs(watchingDate).isSame(dateFrom) ||
+      dayjs(watchingDate).isBetween(dateFrom, dateTo) ||
+      dayjs(watchingDate).isSame(dateTo)
     ) {
       return counter + 1;
     }
@@ -97,27 +94,80 @@ export const countCompletedFilmInDateRange = (films, dateFrom, dateTo) =>
     return counter;
   }, 0);
 
-export const countFilmsInDateRange = (films) => {
-// посчитать, сколько фильмов каждого жанра было просмотрено
-  // пройтись по всем всему массиву с объектами films и проверять, если в объекте есть массив в котором есть нужный мне жанр, то увеличивать счётчик на единицу
-  //как понять, какие мне жанры нужны
-  //нужны те, что возвращает getGenresInRange
-  //может использовать ф-ю что была раньше для фильтрации? или просто филтрацию
+const initialGenres = {
+  musical: 0,
+  western: 0,
+  drama: 0,
+  comedy: 0,
+  mystery: 0,
+  filmNoir: 0,
 };
 
-export const getGenresInRange = ({ films, dateFrom, dateTo }) => {
-  let genres = [];
-  const stepDate = new Date(dateFrom);
-
-  while (dayjs(stepDate).isSameOrBefore(dateTo)) {
-    films.forEach((film) => {
-       genres = [...film.filmInfo.genres];
-    })
-    stepDate.setDate(stepDate.getDate() + 1);
+export const countFilmsInDateRange = (genres) => genres.reduce((acc, curGenre) => {
+  if (curGenre === 'Musical') {
+    acc.musical++;
   }
+
+  if (curGenre === 'Western') {
+    acc.western++;
+  }
+
+  if (curGenre === 'Drama') {
+    acc.drama++;
+  }
+
+  if (curGenre === 'Comedy') {
+    acc.comedy++;
+  }
+
+  if (curGenre === 'Mystery') {
+    acc.mystery++;
+  }
+
+  if (curGenre === 'Film-Noir') {
+    acc.filmNoir++;
+  }
+
+  return  acc;
+}, initialGenres);
+
+export const getGenresInRange = (films, dateFrom, dateTo) => {
+  let genres = [];
+
+  films.filter((film) => {
+    const { watchingDate } = film.userDetails;
+
+    if (
+      dayjs(watchingDate).isSame(dateFrom) ||
+      dayjs(watchingDate).isBetween(dateFrom, dateTo) ||
+      dayjs(watchingDate).isSame(dateTo)
+    ) {
+      films.forEach((film) => {
+        genres = [...genres, ...film.filmInfo.genres];
+      })
+    }
+
+  } )
 
   return genres;
 };
+
+export const colorsChart = {
+  yellow: '#ffe800',
+  white: '#ffffff',
+}
+
+export const getCountsFilmsGenres = () => {
+  const countsFilmsGenres = [];
+  for (let genre in initialGenres) {
+    if (initialGenres[genre] !== 0) {
+      countsFilmsGenres.push(initialGenres[genre]);
+    }
+  }
+  countsFilmsGenres.sort((a, b) => b - a);
+
+  return countsFilmsGenres;
+}
 
 export {
   getRandomInteger,

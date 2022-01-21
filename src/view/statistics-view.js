@@ -1,9 +1,12 @@
 import SmartView from './smart-view';
-import {filter} from '../filters';
-import {FilterType} from '../const';
 import dayjs from 'dayjs';
-import {countCompletedFilmInDateRange, getGenresInRange, unique} from '../utils';
-import {Chart} from 'chart.js';
+import {
+  colorsChart,
+  countCompletedFilmInDateRange, countFilmsInDateRange, getCountsFilmsGenres,
+  getGenresInRange,
+  makeItemsUniq
+} from '../utils';
+import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 const StatisticsItems = [
@@ -41,26 +44,29 @@ const createStatisticsFiltersItem = ({ name, type }) => (
     <label for="statistic-${type}" class="statistic__filters-label">${name}</label>`
 )
 
-const renderGenresChart = (genresCtx, films, dateFrom, dateTo) => {
-  const genres = unique(getGenresInRange(films, dateFrom, dateTo));
+const renderChart = (genresCtx, films, dateFrom, dateTo) => {
+  const genres = getGenresInRange(films, dateFrom, dateTo);
+  const uniqGenres = makeItemsUniq(genres);
 
-  return new Chart(document.querySelector('.statistic__chart'), {
+  countFilmsInDateRange(genres);
+
+
+  genresCtx.height = 500;
+
+  if(uniqGenres.length === 0) {
+    return;
+  }
+
+  return new Chart(genresCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: [
-        'Musical',
-        'Western',
-        'Drama',
-        'Comedy',
-        'Mystery',
-        'Film-Noir',
-      ], // сюда подставить genres
+      labels: uniqGenres,
       datasets: [
         {
-          data: [11, 8, 7, 4, 3, 1], // сюда передать количество фильмов по каждому жанру, длинна массива должна быть такой же как  genres.length
-          backgroundColor: '#ffe800',
-          hoverBackgroundColor: '#ffe800',
+          data: getCountsFilmsGenres(),
+          backgroundColor: colorsChart.yellow,
+          hoverBackgroundColor: colorsChart.yellow,
           anchor: 'start',
           barThickness: 24,
         }
@@ -73,7 +79,7 @@ const renderGenresChart = (genresCtx, films, dateFrom, dateTo) => {
           font: {
             size: 20,
           },
-          color: '#ffffff',
+          color: colorsChart.white,
           anchor: 'start',
           align: 'start',
           offset: 40,
@@ -82,7 +88,7 @@ const renderGenresChart = (genresCtx, films, dateFrom, dateTo) => {
       scales: {
         yAxes: [{
           ticks: {
-            fontColor: '#ffffff',
+            fontColor: colorsChart.white,
             padding: 100,
             fontSize: 20,
           },
@@ -115,15 +121,8 @@ const renderGenresChart = (genresCtx, films, dateFrom, dateTo) => {
 const createStatisticsTemplate = (data) => {
   const {films, dateFrom, dateTo} = data;
 
-  //функция должна 1) пройтись по массиву с объектами о фильме
-  // 2) проверять, в каких объектах с данными о фильме поле с датой просмотра соответствует выбранному диапозону
-  // 3) пушить их в новый массив, длинна которого и будет 'You watched'
-  //доделать
   const completedFilmCount = countCompletedFilmInDateRange(films, dateFrom, dateTo);
 
-  //как вычислить общее время просмотра (сумма значений ключей film.filmInfo.duration 'нового массива' ?)
-  // как вычислить топ жанр (пройти по 'новому массиву', достать из него значения ключей film.filmInfo.genres
-  // и сделать из них один большой массив, потом проверить какой жанр в этом массиве повторяется чаще всего — как?
   return `<section class="statistic">
     <p class="statistic__rank">
       Your rank
@@ -169,12 +168,11 @@ export default class StatisticsView extends SmartView {
     this._data = {
       films,
 
-     // всё время — это с какой даты?
       dateTo: dayjs().toDate(),
-      dateFrom: dayjs().subtract(7, 'day').toDate(),
+      dateFrom: dayjs().subtract(25, 'year').toDate(),
     };
 
-    this.#setCharts()
+    this.#setCharts();
   }
 
 
@@ -187,7 +185,7 @@ export default class StatisticsView extends SmartView {
     super.removeElement();
 
     if (this.#genresChart) {
-      this.#genresChart.remove();
+      //this.#genresChart.remove();
       this.#genresChart = null;
     }
   }
@@ -196,8 +194,6 @@ export default class StatisticsView extends SmartView {
   restoreHandlers = () => {
     this.#setCharts();
   }
-
-  // Настроить выбор периода, за который нужно выбрать статистику
 
   setStatFilterTypeChangeHandler = () => {
     this.element.addEventListener('change', this.#dateChangeHandler);
@@ -211,7 +207,8 @@ export default class StatisticsView extends SmartView {
 
     switch (evt.target.value) {
       case 'all-time':
-        return console.log('Всё время');
+        dateFrom = dayjs().subtract(25, 'year').toDate();
+        break;
       case 'today':
         dateFrom = dayjs().subtract(24, 'hour').toDate();
         break;
@@ -241,6 +238,6 @@ export default class StatisticsView extends SmartView {
     const {films, dateFrom, dateTo} = this._data;
     const genresCtx = this.element.querySelector('.statistic__chart')
 
-    this.#genresChart = renderGenresChart(genresCtx, films, dateFrom, dateTo);
+    this.#genresChart = renderChart(genresCtx, films, dateFrom, dateTo);
   }
 }
