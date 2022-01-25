@@ -50,8 +50,9 @@ export default class FilterPresenter {
     const filters = this.filters;
     const prevFilterComponent = this.#filterComponent;
 
-    this.#filterComponent = new MenuView(filters, this.#filterModel.filter);
+    this.#filterComponent = new MenuView(filters, this.#filterModel.filter, this.#filmsModel, this.#filterContainer);
     this.#filterComponent.setFilterTypeClickHandler(this.#handleFilterTypeChange);
+    this.#filterComponent.setStatsElementClickHandler(this.#handleStatsView);
 
     if (prevFilterComponent === null) {
       render(this.#filterContainer, this.#filterComponent);
@@ -72,5 +73,12 @@ export default class FilterPresenter {
     }
 
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+  }
+
+  #handleStatsView = (filterType) => {
+    if (this.#filterModel.filter === filterType) {
+      return;
+    }
+    this.#filterModel.setFilter(UpdateType.DESTROY, filterType);
   }
 }

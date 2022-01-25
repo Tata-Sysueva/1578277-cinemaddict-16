@@ -2,11 +2,30 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
+dayjs.extend(isBetween);
+dayjs.extend(isSameOrBefore);
+
 export const SortType = {
   DEFAULT: 'default',
   BY_DATE: 'date',
   BY_RATING: 'rating',
   BY_COMMENTED: 'most commented',
+};
+
+export const colorsChart = {
+  yellow: '#ffe800',
+  white: '#ffffff',
+};
+
+const Ranks = {
+  NOVICE: 'Novice',
+  FAN: 'Fun',
+  MOVIE_BUFF: 'Movie Buff',
+};
+
+const RankLevel = {
+  NOVICE: 10,
+  FAN: 20,
 };
 
 const getRandomInteger = (a = 0, b = 1) => {
@@ -37,6 +56,10 @@ const uppercaseFirstLetter = (string) => string.slice(0,1).toUpperCase() + strin
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
+export const SortFilmsComments = (a, b) => b.comments.length - a.comments.length;
+export const SortFilmsRelease = (a, b) => b.filmInfo.release.date - a.filmInfo.release.date;
+export const SortFilmsRating = (a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating;
+
 export const getSortedFilms = (films, sortType, sourcedFilms) => {
   switch (sortType) {
     case SortType.BY_COMMENTED:
@@ -50,91 +73,22 @@ export const getSortedFilms = (films, sortType, sourcedFilms) => {
   }
 };
 
-export const unique = (arr) => {
-  let result = [];
+export const getValues = (array, commentId) => array.filter((commentInfo) => commentInfo.id === commentId);
 
-  for (let elem of arr) {
-    if (!result.includes(elem)) {
-      result.push(elem);
-    }
-  }
-
-  return result;
-};
-
-export const makeItemsUniq = (items) => [...new Set(items)];
-
-export const getValues = (array, commentId) => {
-  return array.filter((commentInfo) => commentInfo.id === commentId);
-}
-
-export const SortFilmsComments = (a, b) => b.comments.length - a.comments.length;
-export const SortFilmsRelease = (a, b) => b.filmInfo.release.date - a.filmInfo.release.date;
-export const SortFilmsRating = (a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating;
-
-dayjs.extend(isBetween);
-dayjs.extend(isSameOrBefore);
-
-export const countCompletedFilmInDateRange = (films, dateFrom, dateTo) =>
-  films.reduce((counter, film) => {
-    const { watchingDate } = film.userDetails;
-
-    if (watchingDate === null) {
-      return counter;
-    }
-
-    if (
-      dayjs(watchingDate).isSame(dateFrom) ||
-      dayjs(watchingDate).isBetween(dateFrom, dateTo) ||
-      dayjs(watchingDate).isSame(dateTo)
-    ) {
-      return counter + 1;
-    }
-
-    return counter;
-  }, 0);
-
-const initialGenres = {
-  musical: 0,
-  western: 0,
-  drama: 0,
-  comedy: 0,
-  mystery: 0,
-  filmNoir: 0,
-};
-
-export const countFilmsInDateRange = (genres) => genres.reduce((acc, curGenre) => {
-  if (curGenre === 'Musical') {
-    acc.musical++;
-  }
-
-  if (curGenre === 'Western') {
-    acc.western++;
-  }
-
-  if (curGenre === 'Drama') {
-    acc.drama++;
-  }
-
-  if (curGenre === 'Comedy') {
-    acc.comedy++;
-  }
-
-  if (curGenre === 'Mystery') {
-    acc.mystery++;
-  }
-
-  if (curGenre === 'Film-Noir') {
-    acc.filmNoir++;
+export const countGenresInRange = (genres) => genres.reduce((acc, curGenre) => {
+  if (!acc[curGenre]) {
+    acc[curGenre] = 1;
+  } else {
+    acc[curGenre]++;
   }
 
   return  acc;
-}, initialGenres);
+}, {});
 
 export const getGenresInRange = (films, dateFrom, dateTo) => {
-  let genres = [];
+  const genres = [];
 
-  films.filter((film) => {
+  films.forEach((film) => {
     const { watchingDate } = film.userDetails;
 
     if (
@@ -142,32 +96,48 @@ export const getGenresInRange = (films, dateFrom, dateTo) => {
       dayjs(watchingDate).isBetween(dateFrom, dateTo) ||
       dayjs(watchingDate).isSame(dateTo)
     ) {
-      films.forEach((film) => {
-        genres = [...genres, ...film.filmInfo.genres];
-      })
+      genres.push(film.filmInfo.genres);
     }
-
-  } )
-
-  return genres;
+  });
+  return genres.flat();
 };
 
-export const colorsChart = {
-  yellow: '#ffe800',
-  white: '#ffffff',
-}
+export const getTopGenre = (films, dateFrom, dateTo) => {
+  const genres = getGenresInRange(films, dateFrom, dateTo);
+  const genresStats = countGenresInRange(genres);
+  const labelsData = Object.values(genresStats);
+  const genresValue = Math.max.apply(null, labelsData);
 
-export const getCountsFilmsGenres = () => {
-  const countsFilmsGenres = [];
-  for (let genre in initialGenres) {
-    if (initialGenres[genre] !== 0) {
-      countsFilmsGenres.push(initialGenres[genre]);
+  return Object.keys(genresStats).find((key) => genresStats[key] === genresValue);
+};
+
+export const getFilmsInRange = (films, dateFrom, dateTo) => {
+  const filmsInRange = [];
+
+  films.filter((film) => {
+    const { watchingDate } = film.userDetails;
+    if (
+      dayjs(watchingDate).isSame(dateFrom) ||
+      dayjs(watchingDate).isBetween(dateFrom, dateTo) ||
+      dayjs(watchingDate).isSame(dateTo) &&
+      film.userDetails.alreadyWatched
+    ) {
+      filmsInRange.push(film);
     }
-  }
-  countsFilmsGenres.sort((a, b) => b - a);
+  });
+  return filmsInRange;
+};
 
-  return countsFilmsGenres;
-}
+export const getRank = (films) => {
+  if (!films) {
+    return '';
+  } else if (films <= RankLevel.NOVICE) {
+    return Ranks.NOVICE;
+  } else if ((films > RankLevel.NOVICE) && (films <= RankLevel.FAN) ) {
+    return Ranks.FAN;
+  }
+  return Ranks.MOVIE_BUFF;
+};
 
 export {
   getRandomInteger,
@@ -176,5 +146,4 @@ export {
   createRandomArr,
   uppercaseFirstLetter,
   isEscapeKey,
-  //getSortedFilms,
 };

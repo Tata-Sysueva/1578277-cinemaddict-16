@@ -28,7 +28,7 @@ export default class CardFilmPresenter {
     const prevFilmComponent = this.#filmComponent;
 
     this.#filmComponent = new CardFilmView(film);
-    this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick)
+    this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick);
 
     this.#comments = getCommentArray();
     this.#commentsModel = new CommentsModel();

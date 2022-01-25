@@ -26,7 +26,7 @@ const createSiteMenuTemplate = (filmsFilter, currentFilterType) => (
     <div class="main-navigation__items">
       ${filmsFilter.map((filter) => createFilterTemplate(filter, currentFilterType)).join('')}
     </div>
-    <a href="#stats" class="main-navigation__additional">Stats</a>
+    <a href="#stats" class="main-navigation__additional${currentFilterType === 'stats' ? ' main-navigation__additional--active' : '' }">Stats</a>
   </nav>`
 );
 
@@ -46,11 +46,31 @@ export default class MenuView extends AbstractView {
 
   setFilterTypeClickHandler = (callback) => {
     this._callback.filterTypeChange = callback;
-    this.element.addEventListener('click', this.#filterTypeClickHandler);
-  }
+    const filterItems = this.element.querySelector('.main-navigation__items');
+    filterItems.addEventListener('click', this.#filterTypeClickHandler);
+  };
 
   #filterTypeClickHandler = (evt) => {
     evt.preventDefault();
+
+    const navigationItemElement = evt.target.closest('a.main-navigation__item');
+
+    if (!navigationItemElement) {
+      return;
+    }
+
     this._callback.filterTypeChange(evt.target.id);
+  }
+
+  setStatsElementClickHandler = (callback) => {
+    this._callback.filterTypeChange = callback;
+    const statsElement = this.element.querySelector('.main-navigation__additional');
+    statsElement.addEventListener('click', this.#statsElementClickHandler);
+  }
+
+  #statsElementClickHandler = (evt) => {
+    evt.preventDefault();
+    const href = evt.target.getAttribute('href').slice(1);
+    this._callback.filterTypeChange(href);
   }
 }

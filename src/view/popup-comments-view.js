@@ -1,5 +1,4 @@
 import AbstractView from './abstract-view';
-import {getCommentArray} from '../mock/comment';
 import CommentPopupView from './comment-view';
 import {render} from '../render';
 import {getValues} from '../utils';
@@ -38,9 +37,8 @@ export default class CommentsContainerView extends AbstractView {
     this.#commentsId = this.#film.comments;
 
     this.#commentsList = this.element.querySelector('.film-details__comments-list');
-    this.#commentsId.forEach((commentId) => {
-        render(this.#commentsList, new CommentPopupView(getValues(this.#commentsInfo, commentId)))
-      }
-    );
+    this.#commentsId.forEach((commentId) => render(this.#commentsList,
+      new CommentPopupView(getValues(this.#commentsInfo, commentId))
+    ));
   }
 }

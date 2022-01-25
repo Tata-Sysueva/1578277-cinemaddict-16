@@ -1,6 +1,4 @@
 import SmartView from './smart-view';
-import {UpdateType, UserAction} from '../const';
-import {getRandomInteger} from '../utils';
 
 const EMOJIS = [
   'smile',

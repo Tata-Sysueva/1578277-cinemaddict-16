@@ -6,6 +6,7 @@ export default class CommentsModel extends AbstractObservable {
   set comments(comments) {
     this.#comments = [...comments];
   }
+
   get comments() {
     return this.#comments;
   }

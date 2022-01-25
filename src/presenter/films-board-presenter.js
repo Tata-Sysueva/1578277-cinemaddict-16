@@ -1,13 +1,14 @@
 import FilmsBoardView from '../view/films-board-view';
 import FilmsView from '../view/films-view';
 import ButtonShowMoreView from '../view/button-show-more';
-import {render, RenderPosition} from '../render.js';
-import {SortType, SortFilmsComments, SortFilmsRelease, SortFilmsRating, getSortedFilms} from '../utils';
+import {remove, render, RenderPosition} from '../render.js';
+import {SortType, SortFilmsRelease, SortFilmsRating} from '../utils';
 import CardFilmPresenter from './card-film-presenter';
 import FilmsContainerView from '../view/films-container-view';
 import SortView from '../view/sort-view';
-import {FilmsInfo, FilterType, UpdateType} from '../const';
+import {FilmsInfo, UpdateType} from '../const';
 import {filter} from '../filters';
+import StatisticsView from '../view/statistics-view';
 
 const CARDS_COUNT_PER_STEP = 5;
 
@@ -22,12 +23,15 @@ export default class FilmsSectionsPresenter {
   #sortComponent = null;
   #showMoreButton = null;
   #filterModel = null;
+  #statisticsComponent = null;
 
   #filmsBoardElement = new FilmsBoardView();
 
   #renderedCardsCount = CARDS_COUNT_PER_STEP;
   #cardFilmPresenter = new Map();
   #currentSortType = SortType.DEFAULT;
+
+  #statisticsMode = false;
 
   constructor(boardContainer, filmsModel, filterModel) {
     this.#boardContainer = boardContainer;
@@ -67,14 +71,32 @@ export default class FilmsSectionsPresenter {
     switch (updateType) {
       case UpdateType.PATCH:
         this.#cardFilmPresenter.get(data.id).init(data);
+
         break;
       case UpdateType.MINOR:
         this.#clearBoard();
         this.#renderCardList();
+
         break;
       case UpdateType.MAJOR:
+        if (this.#statisticsMode) {
+          this.#statisticsMode = false;
+          remove(this.#statisticsComponent);
+        }
+
         this.#clearBoard({resetRenderedFilmCount: true, resetSortType: true});
         this.#renderCardList();
+
+        break;
+      case UpdateType.DESTROY:
+        this.#statisticsMode = true;
+
+        remove(this.#filmsBoardElement);
+        remove(this.#sortComponent);
+
+        this.#statisticsComponent = new StatisticsView(this.films);
+        render(this.#boardContainer, this.#statisticsComponent);
+
         break;
     }
   }
