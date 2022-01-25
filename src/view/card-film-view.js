@@ -1,20 +1,23 @@
 import pluralize from 'pluralize';
 import AbstractView from './abstract-view';
-import SmartView from './smart-view';
+import {FilterType} from '../const';
 
-const createCardFilm = ({ comments, filmInfo, userDetails }) => (
-  `<article class="film-card">
+const createCardFilm = ({ comments, filmInfo, userDetails }) => {
+  const runTimeHour = Math.floor(filmInfo.runtime/60);
+  const runTimeMinutes = Math.round(filmInfo.runtime - (runTimeHour * 60));
+
+  return   `<article class="film-card">
     <a class="film-card__link">
       <h3 class="film-card__title">${filmInfo.title}</h3>
       <p class="film-card__rating">${filmInfo.totalRating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${filmInfo.release.date}</span>
-        <span class="film-card__duration">${filmInfo.runtime}h ${filmInfo.runtime}m</span>
+        <span class="film-card__duration">${ runTimeHour }h ${ runTimeMinutes }m</span>
         <span class="film-card__genre">${filmInfo.genre}</span>
       </p>
       <img src="./images/posters/${filmInfo.poster}" alt="${filmInfo.title}" class="film-card__poster">
       <p class="film-card__description">${filmInfo.description}</p>
-      <span class="film-card__comments">${comments.length} ${pluralize('comment', comments.length)}</span>
+      <span class="film-card__comments">${comments.size} ${pluralize('comment', comments.size)}</span>
     </a>
     <div class="film-card__controls">
       <button
@@ -36,27 +39,20 @@ const createCardFilm = ({ comments, filmInfo, userDetails }) => (
         Mark as favorite
       </button>
     </div>
-  </article>`
-);
+  </article>`;
+};
 
-export default class CardFilmView extends SmartView {
+export default class CardFilmView extends AbstractView {
   #filmInfo = null;
-  #callback = null;
+  #userAction = null;
 
-  constructor(filmInfo, callbackControls) {
+  constructor(filmInfo) {
     super();
     this.#filmInfo = filmInfo;
-    this.#callback = callbackControls;
-    this._data = CardFilmView.parseFilmsToData(filmInfo);
-    this.#setOnFilmControlsClick(callbackControls);
   }
 
   get template() {
-    return createCardFilm(this._data);
-  }
-
-  restoreHandlers = () => {
-    this.#setOnFilmControlsClick(this.#callback);
+    return createCardFilm(this.#filmInfo);
   }
 
   setOnPopupClick = (callback) => {
@@ -72,7 +68,7 @@ export default class CardFilmView extends SmartView {
     }
   }
 
-  #setOnFilmControlsClick = (callbackControls) => {
+  setOnFilmControlsClick = (callbackControls) => {
     this._callback.controlsClick = callbackControls;
     this.element.addEventListener('click', this.#onControlsClick);
   }
@@ -80,30 +76,43 @@ export default class CardFilmView extends SmartView {
   #onControlsClick = (evt) => {
     evt.preventDefault();
 
-    if (!evt.target.closest('.film-card__controls-item')) {
+    if (!evt.target.closest('.film-card__controls')) {
       return;
     }
 
     switch (evt.target) {
       case evt.target.closest('.film-card__controls-item--add-to-watchlist'):
-        this._data = {...this._data, watchlist: !this._data.watchlist};
+        this.#userAction = FilterType.WATCHLIST;
+        this.#filmInfo = {...this.#filmInfo,
+          userDetails: {
+            ...this.#filmInfo.userDetails,
+            watchlist: !this.#filmInfo.userDetails.watchlist
+          }
+        };
         break;
       case evt.target.closest('.film-card__controls-item--mark-as-watched'):
-        this._data = {...this._data, alreadyWatched: !this._data.alreadyWatched};
+        this.#userAction = FilterType.HISTORY;
+        this.#filmInfo = {...this.#filmInfo,
+          userDetails: {
+            ...this.#filmInfo.userDetails,
+            alreadyWatched: !this.#filmInfo.userDetails.alreadyWatched
+          }
+        };
         break;
       case evt.target.closest('.film-card__controls-item--favorite'):
-        this._data = {...this._data, favorite: !this._data.favorite};
+        this.#userAction = FilterType.FAVORITES;
+        this.#filmInfo = {...this.#filmInfo,
+          userDetails: {
+            ...this.#filmInfo.userDetails,
+            favorite: !this.#filmInfo.userDetails.favorite
+          }
+        };
         break;
       default:
-        this._data = {...this._data};
+        this.#filmInfo = {...this.#filmInfo};
     }
 
-    this.updateData({
-      userDetails: {...this._data}
-    });
-
-    this._callback.controlsClick(this._data);
+    this._callback.controlsClick(this.#filmInfo, this.#userAction);
   }
-
-  static parseFilmsToData = (filmDetails) => ({...filmDetails});
 }
+

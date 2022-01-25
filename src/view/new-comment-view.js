@@ -40,7 +40,7 @@ const createNewComment = ({ text, emotion }) => (
       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${text}</textarea>
     </label>
 
-  ${createEmojiList(emotion)}
+    ${createEmojiList(emotion)}
   </div>`
 );
 
@@ -76,11 +76,29 @@ export default class NewCommentView extends SmartView {
   }
 
   #descriptionInputHandler = (evt) => {
-    evt.preventDefault();
     this.updateData({
       text: evt.target.value,
     }, true);
   }
+
+  // setCommentAddHandler = () => {
+  //   this.element.addEventListener('keydown', this.#handleCommentAdd);
+  // }
+  //
+  // #handleCommentAdd = (evt) => {
+  //   //проверять событие клавиатуры
+  //   this.#changeData(
+  //     UserAction.ADD_COMMENT,
+  //     UpdateType.MINOR,
+  //     {
+  //       id: getRandomInteger(10, 20), ...this.#commentsInfo,
+  //       author: 'Me',
+  //       comment: this.element.querySelector('.film-details__comment-input').value,
+  //       date: 'now',
+  //       emotion: this.#emojiClickHandler,
+  //     },
+  //   );
+  //}
 
   static parseCommentToDate = (data) => ({...data})
 }

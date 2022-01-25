@@ -19,10 +19,12 @@ export default class PopupContainerView extends SmartView {
   #film = null;
   #topContainer = null;
   #bottomContainer = null;
+  #commentsModel = null;
 
-  constructor(film, controlsCallback) {
+  constructor(film, controlsCallback, commentsModel) {
     super();
     this.#film = film;
+    this.#commentsModel = commentsModel;
 
     this.#topContainer = this.element.querySelector('.film-details__top-container');
     this.#bottomContainer = this.element.querySelector('.film-details__bottom-container');
@@ -31,7 +33,7 @@ export default class PopupContainerView extends SmartView {
     render(this.#topContainer, new PopupFilmInfoView(this.#film));
     render(this.#topContainer, new PopupControlsView(this.#film.userDetails, controlsCallback));
 
-    render(this.#bottomContainer, new CommentsContainerView());
+    render(this.#bottomContainer, new CommentsContainerView(this.#film, this.#commentsModel));
     render(this.#bottomContainer, new NewCommentView());
   }
 

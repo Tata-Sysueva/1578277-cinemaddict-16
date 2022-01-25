@@ -1,6 +1,5 @@
 import {getRandomArrayElement, getRandomInteger} from '../utils';
 import dayjs from 'dayjs';
-import {nanoid} from 'nanoid';
 
 const author = [
   'Vladimir Lenin',
@@ -44,10 +43,14 @@ const generateDate = () => {
     .format('YYYY/MM/DD hh:mm');
 };
 
-export const generateComment = () => ({
-  id: nanoid(),
+export const generateNewComment = (count) => ({
+  id: count,
   author: getRandomArrayElement(author),
   comment: getRandomArrayElement(text),
   date: generateDate(),
   emotion: getRandomArrayElement(reaction),
 });
+
+export const getCommentArray = () => Array.from({length: 10},
+  (item, count) => generateNewComment(count + 1)
+);

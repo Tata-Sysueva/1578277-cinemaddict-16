@@ -2,7 +2,8 @@ import {
   getRandomInteger,
   getRandomArrayElement,
   getFloatingPointNumber,
-  createRandomArr} from '../utils';
+  createRandomArr,
+} from '../utils';
 
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
@@ -96,22 +97,26 @@ const COUNTRIES = [
 
 const COMMENTS = [];
 
-for (let i = 0; i < getRandomInteger(0, 100); i++ ) {
-  COMMENTS.push(`${getRandomInteger(0, 1000)}`);
+for (let i = 0; i < getRandomInteger(0, 10); i++ ) {
+  COMMENTS.push(`${getRandomInteger(0, 10)}`);
 }
-
-const generateDuration = (time) =>Math.floor(time / 60);
 
 const generateDate = () => {
   const randomDay = getRandomInteger(1, 7);
   const randomMonth = getRandomInteger(0, 11);
-  const randomYear = getRandomInteger(-100, 0);
+  const randomYear = getRandomInteger(-5, 0);
   return dayjs().add(randomDay, 'day').add(randomMonth, 'month').add(randomYear, 'year').format('DD MMMM YYYY');
+};
+
+const getComments = () => {
+  const comments = Array.from({length: getRandomInteger(1, 10)}, () => getRandomInteger(0, 10));
+
+  return new Set(comments);
 };
 
 export const generateCardFilm = () => ({
   id: nanoid(),
-  comments: createRandomArr(COMMENTS),
+  comments: getComments(),
   filmInfo: {
     title: getRandomArrayElement(TITLES),
     alternativeTitle: getRandomArrayElement(TITLES),
@@ -125,7 +130,7 @@ export const generateCardFilm = () => ({
       date: getRandomInteger(1900, 1980),
       releaseCountry: getRandomArrayElement(COUNTRIES),
     },
-    runtime: generateDuration(getRandomInteger(60, 300)),
+    runtime: getRandomInteger(60, 300),
     genre: getRandomArrayElement(GENRES),
     genres: createRandomArr(GENRES),
     description: getRandomArrayElement(DESCRIPTIONS),
@@ -133,7 +138,7 @@ export const generateCardFilm = () => ({
   userDetails: {
     watchlist: Boolean(getRandomInteger(0, 1)),
     alreadyWatched: Boolean(getRandomInteger(0, 1)),
-    watchingDate: generateDate(),
+    watchingDate: generateDate(), // '24 January 2022' /ничего не перерисовывается, потому что у меня дурацкие моковые днные
     favorite: Boolean(getRandomInteger(0, 1)),
   }
 });
