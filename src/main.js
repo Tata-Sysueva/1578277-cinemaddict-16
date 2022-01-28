@@ -1,18 +1,16 @@
 import ProfileView from './view/profile-view';
 import FooterView from './view/footer-view';
 import {render} from './render';
-import {generateCardFilm} from './mock/film-card';
 import FilmsSectionsPresenter from './presenter/films-board-presenter';
 import FilmsModel from './model/films-model';
 import FilterModel from './model/filter-model';
 import FilterPresenter from './presenter/filter-presenter';
+import ApiService from './api-service.js';
 
-const CARD_COUNT = 25;
+const AUTHORIZATION = 'Basic c4320a4476d34d4bba63f4c6c2d65bdc';
+const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 
-const films = Array.from({length: CARD_COUNT}, generateCardFilm);
-
-const filmsModel = new FilmsModel();
-filmsModel.films = films;
+const filmsModel = new FilmsModel(new ApiService(END_POINT, AUTHORIZATION));
 
 const filterModel = new FilterModel();
 
@@ -26,6 +24,7 @@ const filmsSectionsPresenter = new FilmsSectionsPresenter(siteMainElement, films
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
 filterPresenter.init();
 
-render(siteFooterElement, new FooterView(films.length));
+render(siteFooterElement, new FooterView(filmsModel.films.length));
 
 filmsSectionsPresenter.init();
+filmsModel.init().then();

@@ -122,11 +122,24 @@ const renderChart = (genresCtx, dateFrom, dateTo, films) => {
 const createStatisticsTemplate = (data) => {
   const { films, dateFrom, dateTo } = data;
   const filmsWatched = getFilmsInRange(films, dateFrom, dateTo);
-  const countFilmsWatched = filmsWatched.length; // дебильные моки и ничего не перерисовывается
+
+  const countFilmsWatched = filmsWatched.length;
   const topGenre = countFilmsWatched ? getTopGenre(films, dateFrom, dateTo) : ' ';
   let runTime = 0;
 
-  filmsWatched.forEach((film) => runTime = runTime + film.filmInfo.runtime);
+  filmsWatched.forEach((film) => {
+    runTime = runTime + film.filmInfo.runtime;
+
+    return runTime;
+  });
+
+  // const countTotalFilmsWatched = (filmsWatched) => filmsWatched.reduce((runTime, curFilm) => {
+  //   runTime = curFilm.filmInfo.runtime++;
+  //
+  //   return runTime;
+  // }, runTime);
+  //
+  // const totalRunTime = countTotalFilmsWatched(filmsWatched);
 
   const runTimeHour = Math.floor(runTime/60);
   const runTimeMinutes = Math.round(runTime - (runTimeHour * 60));
@@ -177,7 +190,7 @@ export default class StatisticsView extends SmartView {
 
   constructor(films) {
     super();
-
+    console.log(films);
     this._data = {
       films,
 

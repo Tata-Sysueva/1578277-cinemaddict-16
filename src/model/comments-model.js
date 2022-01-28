@@ -1,7 +1,14 @@
 import AbstractObservable from '../abstract-observable';
+import {UpdateType} from '../const';
 
 export default class CommentsModel extends AbstractObservable {
   #comments = [];
+  #apiService = null;
+
+  constructor(apiService) {
+    super();
+    this.#apiService = apiService;
+  }
 
   set comments(comments) {
     this.#comments = [...comments];
@@ -9,6 +16,16 @@ export default class CommentsModel extends AbstractObservable {
 
   get comments() {
     return this.#comments;
+  }
+
+  init = async (film) => {
+    console.log(film.id);
+    try {
+      this.#comments = await this.#apiService.getComments(film.id);
+    } catch(err) {
+      throw new Error('Can/t found comments');
+    }
+    this._notify(UpdateType.INIT);
   }
 
   addComment = (updateType, data) => {

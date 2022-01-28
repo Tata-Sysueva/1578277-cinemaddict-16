@@ -4,7 +4,10 @@ import PopupContainerView from '../view/popup-container-view';
 import {isEscapeKey} from '../utils';
 import {UpdateType} from '../const.js';
 import CommentsModel from '../model/comments-model';
-import {getCommentArray} from '../mock/comment';
+import ApiService from '../api-service';
+
+const AUTHORIZATION = 'Basic c4320a4476d34d4bba63f4c6c2d65bdc';
+const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 
 export default class CardFilmPresenter {
   #container = null;
@@ -14,7 +17,6 @@ export default class CardFilmPresenter {
   #changeData = null;
   #filterType = null;
   #commentsModel = null;
-  #comments = null;
 
   constructor(container, changeData, filterType) {
     this.#container = container;
@@ -30,11 +32,14 @@ export default class CardFilmPresenter {
     this.#filmComponent = new CardFilmView(film);
     this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick);
 
-    this.#comments = getCommentArray();
-    this.#commentsModel = new CommentsModel();
-    this.#commentsModel.comments = this.#comments;
+    this.#commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION));
 
-    this.#filmComponent.setOnPopupClick(() => this.#renderPopup(film, this.#comments));
+    this.#filmComponent.setOnPopupClick(() => {
+      this.#commentsModel.init(film);
+      const comments = this.#commentsModel.comments;
+
+      this.#renderPopup(film, comments);
+    });
 
     if (prevFilmComponent === null) {
       render(this.#container, this.#filmComponent);
@@ -66,9 +71,9 @@ export default class CardFilmPresenter {
     }
   }
 
-  #handleViewAction = (updateType, date) => {
-    this.#comments.addComment(updateType, date);
-  }
+  // #handleViewAction = (updateType, date) => {
+  //   this.#comments.addComment(updateType, date);
+  // }
 
   #handleControlsClick = (updatedDetails, userAction) => {
     this.#changeData(

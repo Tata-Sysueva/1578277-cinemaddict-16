@@ -13,6 +13,7 @@ export const FilmsInfo = {
   EMPTY_WATCHLIST: {title: 'There are no movies to watch now', isExtra: false},
   EMPTY_HISTORY: {title: 'There are no watched movies now', isExtra: false},
   EMPTY_FAVORITES: {title: 'There are no favorite movies now', isExtra: false},
+  LOADING: {title: 'Loading...', isExtra: false},
 };
 
 export const UserAction = {
@@ -24,6 +25,7 @@ export const UserAction = {
 };
 
 export const UpdateType = {
+  INIT: 'INIT',
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',

@@ -7,7 +7,7 @@ const createFilmInfoTemplate = (filmsInfo) => {
 
   return `<div class="film-details__info-wrap">
     <div class="film-details__poster">
-      <img class="film-details__poster-img" src="./images/posters/${filmInfo.poster}" alt="${filmInfo.title}">
+      <img class="film-details__poster-img" src="${filmInfo.poster}" alt="${filmInfo.title}">
 
       <p class="film-details__age">${filmInfo.ageRating}</p>
     </div>

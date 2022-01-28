@@ -35,22 +35,7 @@ const getRandomInteger = (a = 0, b = 1) => {
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
-const getFloatingPointNumber = (min = 0, max = 10, exp = 1) => Number((Math.random() * (max - min) + min).toFixed(exp));
-
 const getRandomArrayElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
-
-const shuffle = (array) => {
-  const copyArray = array.slice();
-
-  for (let i = copyArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copyArray[i], copyArray[j]] = [copyArray[j], copyArray[i]];
-  }
-
-  return array;
-};
-
-const createRandomArr = (array) => shuffle(array).slice(0, getRandomInteger(0, array.length - 1));
 
 const uppercaseFirstLetter = (string) => string.slice(0,1).toUpperCase() + string.slice(1);
 
@@ -59,19 +44,6 @@ const isEscapeKey = (evt) => evt.key === 'Escape';
 export const SortFilmsComments = (a, b) => b.comments.length - a.comments.length;
 export const SortFilmsRelease = (a, b) => b.filmInfo.release.date - a.filmInfo.release.date;
 export const SortFilmsRating = (a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating;
-
-export const getSortedFilms = (films, sortType, sourcedFilms) => {
-  switch (sortType) {
-    case SortType.BY_COMMENTED:
-      return films.sort(SortFilmsComments);
-    case SortType.BY_DATE:
-      return films.sort(SortFilmsRelease);
-    case SortType.BY_RATING:
-      return films.sort(SortFilmsRating);
-    default:
-      films = sourcedFilms;
-  }
-};
 
 export const getValues = (array, commentId) => array.filter((commentInfo) => commentInfo.id === commentId);
 
@@ -115,12 +87,13 @@ export const getFilmsInRange = (films, dateFrom, dateTo) => {
   const filmsInRange = [];
 
   films.filter((film) => {
-    const { watchingDate } = film.userDetails;
+    const { watchingDate, alreadyWatched } = film.userDetails;
+
     if (
       dayjs(watchingDate).isSame(dateFrom) ||
       dayjs(watchingDate).isBetween(dateFrom, dateTo) ||
       dayjs(watchingDate).isSame(dateTo) &&
-      film.userDetails.alreadyWatched
+      alreadyWatched
     ) {
       filmsInRange.push(film);
     }
@@ -141,9 +114,7 @@ export const getRank = (films) => {
 
 export {
   getRandomInteger,
-  getFloatingPointNumber,
   getRandomArrayElement,
-  createRandomArr,
   uppercaseFirstLetter,
   isEscapeKey,
 };

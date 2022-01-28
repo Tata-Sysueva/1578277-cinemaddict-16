@@ -9,6 +9,7 @@ import SortView from '../view/sort-view';
 import {FilmsInfo, UpdateType} from '../const';
 import {filter} from '../filters';
 import StatisticsView from '../view/statistics-view';
+import LoadingView from '../view/loading-view';
 
 const CARDS_COUNT_PER_STEP = 5;
 
@@ -26,17 +27,21 @@ export default class FilmsSectionsPresenter {
   #statisticsComponent = null;
 
   #filmsBoardElement = new FilmsBoardView();
+  #loadingComponent = new LoadingView();
 
   #renderedCardsCount = CARDS_COUNT_PER_STEP;
   #cardFilmPresenter = new Map();
   #currentSortType = SortType.DEFAULT;
 
   #statisticsMode = false;
+  #isLoading = true;
 
   constructor(boardContainer, filmsModel, filterModel) {
     this.#boardContainer = boardContainer;
     this.#filmsModel = filmsModel;
     this.#filterModel = filterModel;
+
+    this.#renderLoading(FilmsInfo.LOADING.title, FilmsInfo.LOADING.isExtra);
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -68,6 +73,7 @@ export default class FilmsSectionsPresenter {
   }
 
   #handleModelEvent = (updateType, data) => {
+    console.log(updateType);
     switch (updateType) {
       case UpdateType.PATCH:
         this.#cardFilmPresenter.get(data.id).init(data);
@@ -86,7 +92,7 @@ export default class FilmsSectionsPresenter {
         }
 
         this.#clearBoard({resetRenderedFilmCount: true, resetSortType: true});
-        this.#renderCardList();
+        this.#renderFilmsSections(from, to);
 
         break;
       case UpdateType.DESTROY:
@@ -97,6 +103,11 @@ export default class FilmsSectionsPresenter {
         this.#statisticsComponent = new StatisticsView(this.films);
         render(this.#boardContainer, this.#statisticsComponent);
 
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderFilmsSections(from, to);
         break;
       default:
         throw new Error(`Unknown update type: ${updateType}`);
@@ -126,6 +137,7 @@ export default class FilmsSectionsPresenter {
   #clearBoard = ({resetRenderedFilmCount = false, resetSortType = false} = {}) => {
     const filmsCount = this.films.length;
 
+    remove(this.#filmsList);
     this.#filmsContainer.innerHTML = ' ';
 
     remove(this.#sortComponent);
@@ -156,7 +168,7 @@ export default class FilmsSectionsPresenter {
     this.#currentSortType = sortType;
 
     this.#clearBoard({resetRenderedFilmCount: true});
-    this.#renderCardList();
+    this.#renderFilmsSections(from, to);
   }
 
   #renderSort = () => {
@@ -189,8 +201,8 @@ export default class FilmsSectionsPresenter {
   }
 
   #renderFilmsSection = (title, isExtra, films) => {
-    this.#filmsList = new FilmsView(title, isExtra).element;
-    this.#filmsContainer = new FilmsContainerView().element;
+    this.#filmsList = new FilmsView(title, isExtra);
+    this.#filmsContainer = new FilmsContainerView();
     render(this.#filmsBoardElement, this.#filmsList);
     render(this.#filmsList, this.#filmsContainer);
 
@@ -205,7 +217,16 @@ export default class FilmsSectionsPresenter {
     render(this.#filmsBoardElement, new FilmsView(title, isExtra));
   }
 
+  #renderLoading = () => {
+    render(this.#filmsBoardElement, this.#loadingComponent);
+  }
+
   #renderFilmsSections = (from, to) => {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     if (this.films.length > from ) {
       this.#renderFilmsSection(FilmsInfo.ALL.title, FilmsInfo.ALL.isExtra, this.films);
       // this.#renderFilmsSection(
@@ -217,7 +238,7 @@ export default class FilmsSectionsPresenter {
       //   FilmsInfo.MOST_COMMENTED.isExtra,
       //   getSortedFilms(this.films, SortType.BY_COMMENTED).slice(from, to));
     } else {
-      this.#renderEmptySection(FilmsInfo.EMPTY_ALL.title, FilmsInfo.EMPTY_ALL.isExtra);
+      //this.#renderEmptySection(FilmsInfo.EMPTY_ALL.title, FilmsInfo.EMPTY_ALL.isExtra);
     }
-  }
+  };
 }

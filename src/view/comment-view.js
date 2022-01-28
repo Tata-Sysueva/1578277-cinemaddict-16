@@ -24,7 +24,6 @@ export default class CommentPopupView extends AbstractView {
   constructor(commentInfo) {
     super();
     this.#commentInfo = commentInfo;
-    console.log(this.#commentInfo);//иногда приходит пустой массив и попап не открывается
   }
 
   get template() {
