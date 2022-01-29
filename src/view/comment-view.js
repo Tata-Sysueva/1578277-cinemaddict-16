@@ -30,12 +30,12 @@ export default class CommentPopupView extends AbstractView {
     return createComment(this.#commentInfo);
   }
 
-  setDeleteComment = (callback) => {
-    const deleteButton = this.element.querySelector('.film-details__comment-delete');
-    deleteButton.addEventListener('click', this.#deleteClickHandler)
-  }
+  // setDeleteComment = (callback) => {
+  //   const deleteButton = this.element.querySelector('.film-details__comment-delete');
+  //   deleteButton.addEventListener('click', this.#deleteClickHandler)
+  // }
 
-  #deleteClickHandler = () => {
-    this._callback =
-  }
+  // #deleteClickHandler = () => {
+  //   this._callback =
+  // }
 }
