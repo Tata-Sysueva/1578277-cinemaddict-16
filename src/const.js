@@ -10,9 +10,9 @@ export const FilmsInfo = {
   TOP_RATED: {title: 'Top rated', isExtra: true},
   MOST_COMMENTED: {title: 'Most commented', isExtra: true},
   EMPTY_ALL: {title: 'There are no movies in our database', isExtra: true},
-  EMPTY_WATCHLIST: {title: 'There are no movies to watch now', isExtra: false},
-  EMPTY_HISTORY: {title: 'There are no watched movies now', isExtra: false},
-  EMPTY_FAVORITES: {title: 'There are no favorite movies now', isExtra: false},
+  EMPTY_WATCHLIST: {title: 'There are no movies to watch now', isExtra: true},
+  EMPTY_HISTORY: {title: 'There are no watched movies now', isExtra: true},
+  EMPTY_FAVORITES: {title: 'There are no favorite movies now', isExtra: true},
   LOADING: {title: 'Loading...', isExtra: false},
 };
 

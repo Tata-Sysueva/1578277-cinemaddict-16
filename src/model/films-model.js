@@ -42,13 +42,13 @@ export default class FilmsModel extends AbstractObservable {
       ];
       this._notify(updateType, updateFilm);
     } catch(err) {
-      throw new Error('Can\'t update task');
+      throw new Error('Can\'t update film');
     }
   }
 
   #adaptToClient = (film) => {
     const release = {
-      date: film['film_info']['release']['date'] !== null ? new Date(film['film_info']['release']['date']).getFullYear() : film['film_info']['release']['date'],
+      date: film['film_info']['release']['date'] !== null ? new Date(film['film_info']['release']['date']) : film['film_info']['release']['date'],
       releaseCountry: film['film_info']['release']['release_country'],
     };
 
@@ -61,7 +61,7 @@ export default class FilmsModel extends AbstractObservable {
       director: film['film_info']['director'],
       writers: film['film_info']['writers'],
       actors: film['film_info']['actors'],
-      release,
+      release: release,
       genres: film['film_info']['genre'],
       runtime: film['film_info']['runtime'],
       description: film['film_info']['description'],
@@ -84,4 +84,39 @@ export default class FilmsModel extends AbstractObservable {
 
     return adaptedFilm;
   }
+
+//   const adaptedFilm = Object.assign(
+//     {},
+//     film,
+//     {
+//       filmInfo: {
+//         title: film['film_info']['title'],
+//         alternativeTitle: film['film_info']['alternative_title'],
+//         totalRating: film['film_info']['total_rating'],
+//         poster: film['film_info']['poster'],
+//         ageRating: film['film_info']['age_rating'],
+//         director: film['film_info']['director'],
+//         writers: film['film_info']['writers'],
+//         actors: film['film_info']['actors'],
+//         release: {
+//           date: film['film_info']['release']['date'],
+//           releaseCountry: film['film_info']['release']['release_country'],
+//         },
+//         runTime: film['film_info']['runtime'],
+//         genres: film['film_info']['genre'],
+//         description: film['film_info']['description'],
+//       },
+//       userDetails: {
+//         watchlist: film['user_details']['watchlist'],
+//         alreadyWatched: film['user_details']['already_watched'],
+//         watchingDate: film['user_details']['watching_date'],
+//         favorite: film['user_details']['favorite'],
+//       },
+//     });
+//
+//   delete adaptedFilm['film_info'];
+//   delete adaptedFilm['user_details'];
+//
+//   return adaptedFilm;
+// }
 }

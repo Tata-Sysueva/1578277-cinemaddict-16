@@ -1,6 +1,6 @@
 import AbstractView from './abstract-view';
 
-const createComment = ([textComment]) => {
+const createComment = (textComment) => {
   const {author, date, comment, emotion} = textComment;
 
   return `<li class="film-details__comment">
@@ -28,5 +28,14 @@ export default class CommentPopupView extends AbstractView {
 
   get template() {
     return createComment(this.#commentInfo);
+  }
+
+  setDeleteComment = (callback) => {
+    const deleteButton = this.element.querySelector('.film-details__comment-delete');
+    deleteButton.addEventListener('click', this.#deleteClickHandler)
+  }
+
+  #deleteClickHandler = () => {
+    this._callback =
   }
 }

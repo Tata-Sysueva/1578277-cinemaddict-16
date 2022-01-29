@@ -19,22 +19,21 @@ export default class CommentsModel extends AbstractObservable {
   }
 
   init = async (film) => {
-    console.log(film.id);
     try {
       this.#comments = await this.#apiService.getComments(film.id);
     } catch(err) {
-      throw new Error('Can/t found comments');
+      this.#comments = [];
     }
     this._notify(UpdateType.INIT);
   }
 
-  addComment = (updateType, data) => {
-    const newComment = this.generateNewComment(data);
-    //должен быть ещё пуш в filmInfo.comments filmsInfo.comments.push(newComment.id)?
-    this.#comments = [newComment, ...this.#comments];
-
-    this._notify(updateType, newComment);
-  };
+  // addComment = (updateType, data) => {
+  //   const newComment = this.generateNewComment(data);
+  //   //должен быть ещё пуш в filmInfo.comments filmsInfo.comments.push(newComment.id)?
+  //   this.#comments = [newComment, ...this.#comments];
+  //
+  //   this._notify(updateType, newComment);
+  // };
 
   deleteComment = (updateType, commentId) => {
     this.#comments = this.#comments.filter(({ id }) => id !== commentId);

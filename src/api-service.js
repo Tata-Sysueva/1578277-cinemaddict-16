@@ -20,7 +20,7 @@ export default class ApiService {
   getComments = (filmId) => this.#load({url: `comments/${filmId}`})
     .then(ApiService.parseResponse);
 
-  updateFilms = async (film) => {
+  updateFilm = async (film) => {
     const response = await this.#load({
       url: `films/${film.id}`,
       method: Method.PUT,
@@ -56,30 +56,30 @@ export default class ApiService {
 
   #adaptToServer = (film) => {
     const release = {
-      'date': film.date instanceof Date ? film.date.toISOString() : null,
-      'release_country': film.releaseCountry,
+      'date': film.release.date instanceof Date ? film.release.date.toISOString() : null,
+      'release_country': film.release.releaseCountry,
     };
 
     const filmInfo = {
-      'title': film.title,
-      'alternative_title': film.alternativeTitle,
-      'total_rating': film.totalRating,
-      'poster': film.poster,
-      'age_rating': film.ageRating,
-      'director': film.director,
-      'writers': film.writers,
-      'actors': film.actors,
+      'title': film.filmInfo.title,
+      'alternative_title': film.filmInfo.alternativeTitle,
+      'total_rating': film.filmInfo.totalRating,
+      'poster': film.filmInfo.poster,
+      'age_rating': film.filmInfo.ageRating,
+      'director': film.filmInfo.director,
+      'writers': film.filmInfo.writers,
+      'actors': film.filmInfo.actors,
       'release': release,
-      'runtime': film.runtime,
-      'genre': film.genres,
-      'description': film.description,
+      'runtime': film.filmInfo.runtime,
+      'genre': film.filmInfo.genres,
+      'description': film.filmInfo.description,
     };
 
     const userDetails = {
-      'watchlist': film.watchlist,
-      'already_watched': film.alreadyWatched,
-      'watching_date': film.watchingDate,
-      'favorite': film.favorite,
+      'watchlist': film.userDetails.watchlist,
+      'already_watched': film.userDetails.alreadyWatched,
+      'watching_date': film.userDetails.watchingDate,
+      'favorite': film.userDetails.favorite,
     };
 
     const adaptedFilm = {...film,
@@ -87,22 +87,22 @@ export default class ApiService {
       'user_details': userDetails,
     };
 
-    delete adaptedFilm.title;
-    delete adaptedFilm.alternativeTitle;
-    delete adaptedFilm.totalRating;
-    delete adaptedFilm.poster;
-    delete adaptedFilm.ageRating;
-    delete adaptedFilm.director;
-    delete adaptedFilm.writers;
-    delete adaptedFilm.actors;
-    delete adaptedFilm.release;
-    delete adaptedFilm.runtime;
-    delete adaptedFilm.genres;
-    delete adaptedFilm.description;
-    delete adaptedFilm.watchlist;
-    delete adaptedFilm.alreadyWatched;
-    delete adaptedFilm.watchingDate;
-    delete adaptedFilm.favorite;
+    delete adaptedFilm.filmInfo;
+    delete adaptedFilm.userDetails;
+    // delete adaptedFilm.totalRating;
+    // delete adaptedFilm.poster;
+    // delete adaptedFilm.ageRating;
+    // delete adaptedFilm.director;
+    // delete adaptedFilm.writers;
+    // delete adaptedFilm.actors;
+    // delete adaptedFilm.release;
+    // delete adaptedFilm.runtime;
+    // delete adaptedFilm.genres;
+    // delete adaptedFilm.description;
+    // delete adaptedFilm.watchlist;
+    // delete adaptedFilm.alreadyWatched;
+    // delete adaptedFilm.watchingDate;
+    // delete adaptedFilm.favorite;
 
     return adaptedFilm;
   }

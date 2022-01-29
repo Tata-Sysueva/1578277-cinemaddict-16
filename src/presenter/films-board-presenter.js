@@ -6,7 +6,7 @@ import {SortType, SortFilmsRelease, SortFilmsRating} from '../utils';
 import CardFilmPresenter from './card-film-presenter';
 import FilmsContainerView from '../view/films-container-view';
 import SortView from '../view/sort-view';
-import {FilmsInfo, UpdateType} from '../const';
+import {FilmsInfo, FilterType, UpdateType} from '../const';
 import {filter} from '../filters';
 import StatisticsView from '../view/statistics-view';
 import LoadingView from '../view/loading-view';
@@ -35,6 +35,7 @@ export default class FilmsSectionsPresenter {
 
   #statisticsMode = false;
   #isLoading = true;
+  #isEmpty = false;
 
   constructor(boardContainer, filmsModel, filterModel) {
     this.#boardContainer = boardContainer;
@@ -73,7 +74,6 @@ export default class FilmsSectionsPresenter {
   }
 
   #handleModelEvent = (updateType, data) => {
-    console.log(updateType);
     switch (updateType) {
       case UpdateType.PATCH:
         this.#cardFilmPresenter.get(data.id).init(data);
@@ -138,10 +138,15 @@ export default class FilmsSectionsPresenter {
     const filmsCount = this.films.length;
 
     remove(this.#filmsList);
-    this.#filmsContainer.innerHTML = ' ';
+    remove(this.#filmsContainer)
+    //this.#filmsContainer.innerHTML = ' ';
 
     remove(this.#sortComponent);
     this.#showMoreButton.element.remove();
+
+    if (this.#isEmpty) {
+      remove(this.#filmsList);
+    }
 
     if (resetRenderedFilmCount) {
       this.#renderedCardsCount = CARDS_COUNT_PER_STEP;
@@ -204,6 +209,11 @@ export default class FilmsSectionsPresenter {
     this.#filmsList = new FilmsView(title, isExtra);
     this.#filmsContainer = new FilmsContainerView();
     render(this.#filmsBoardElement, this.#filmsList);
+
+    if (this.#isEmpty) {
+      return;
+    }
+
     render(this.#filmsList, this.#filmsContainer);
 
     if (isExtra) {
@@ -211,10 +221,6 @@ export default class FilmsSectionsPresenter {
     } else {
       this.#renderCardList();
     }
-  }
-
-  #renderEmptySection = (title, isExtra) => {
-    render(this.#filmsBoardElement, new FilmsView(title, isExtra));
   }
 
   #renderLoading = () => {
@@ -228,6 +234,8 @@ export default class FilmsSectionsPresenter {
     }
 
     if (this.films.length > from ) {
+      this.#isEmpty = false;
+
       this.#renderFilmsSection(FilmsInfo.ALL.title, FilmsInfo.ALL.isExtra, this.films);
       // this.#renderFilmsSection(
       //   FilmsInfo.TOP_RATED.title,
@@ -238,7 +246,22 @@ export default class FilmsSectionsPresenter {
       //   FilmsInfo.MOST_COMMENTED.isExtra,
       //   getSortedFilms(this.films, SortType.BY_COMMENTED).slice(from, to));
     } else {
-      //this.#renderEmptySection(FilmsInfo.EMPTY_ALL.title, FilmsInfo.EMPTY_ALL.isExtra);
+      this.#isEmpty = true;
+
+      switch (this.#filterModel.filter) {
+        case FilterType.WATCHLIST:
+          this.#renderFilmsSection(FilmsInfo.EMPTY_WATCHLIST.title, FilmsInfo.EMPTY_WATCHLIST.isExtra);
+          break;
+        case FilterType.HISTORY:
+          this.#renderFilmsSection(FilmsInfo.EMPTY_HISTORY.title, FilmsInfo.EMPTY_HISTORY.isExtra);
+          break;
+        case FilterType.FAVORITES:
+          this.#renderFilmsSection(FilmsInfo.EMPTY_FAVORITES.title, FilmsInfo.EMPTY_FAVORITES.isExtra);
+          break;
+        default:
+          this.#renderFilmsSection(FilmsInfo.EMPTY_ALL.title, FilmsInfo.EMPTY_ALL.isExtra);
+          break;
+      }
     }
   };
 }

@@ -32,12 +32,12 @@ export default class CardFilmPresenter {
     this.#filmComponent = new CardFilmView(film);
     this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick);
 
-    this.#commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION));
+    const getComments = async () => await new Promise(
+      () => this.#commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION)))
 
     this.#filmComponent.setOnPopupClick(() => {
-      this.#commentsModel.init(film);
+      getComments().then(this.#commentsModel.init(film))
       const comments = this.#commentsModel.comments;
-
       this.#renderPopup(film, comments);
     });
 

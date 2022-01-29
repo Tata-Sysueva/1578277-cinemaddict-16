@@ -22,9 +22,9 @@ render(siteHeaderElement, new ProfileView());
 
 const filmsSectionsPresenter = new FilmsSectionsPresenter(siteMainElement, filmsModel, filterModel);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
+
 filterPresenter.init();
-
-render(siteFooterElement, new FooterView(filmsModel.films.length));
-
 filmsSectionsPresenter.init();
-filmsModel.init().then();
+filmsModel.init().finally(() => {
+  render(siteFooterElement, new FooterView(filmsModel.films.length));
+});
