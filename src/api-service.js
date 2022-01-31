@@ -1,6 +1,7 @@
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  DELETE: 'DElETE',
 };
 
 export default class ApiService {
@@ -22,7 +23,7 @@ export default class ApiService {
 
   updateFilm = async (film) => {
     const response = await this.#load({
-      url: `films/${film.id}`,
+      url: `movies/${film.id}`,
       method: Method.PUT,
       body: JSON.stringify(this.#adaptToServer(film)),
       headers: new Headers({'Content-Type': 'application/json'}),
@@ -54,10 +55,19 @@ export default class ApiService {
     }
   }
 
+  deleteComment = async (commentId) => {
+    const response = await this.#load({
+      url: `comments/${commentId}`,
+      method: Method.DELETE,
+    });
+
+    return response;
+  }
+
   #adaptToServer = (film) => {
     const release = {
-      'date': film.release.date instanceof Date ? film.release.date.toISOString() : null,
-      'release_country': film.release.releaseCountry,
+      'date': film.filmInfo.release.date instanceof Date ? film.filmInfo.release.date.toISOString() : null,
+      'release_country': film.filmInfo.release.releaseCountry,
     };
 
     const filmInfo = {

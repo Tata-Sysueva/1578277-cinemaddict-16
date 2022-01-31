@@ -10,10 +10,6 @@ export default class CommentsModel extends AbstractObservable {
     this.#apiService = apiService;
   }
 
-  set comments(comments) {
-    this.#comments = [...comments];
-  }
-
   get comments() {
     return this.#comments;
   }
@@ -24,20 +20,35 @@ export default class CommentsModel extends AbstractObservable {
     } catch(err) {
       this.#comments = [];
     }
-    this._notify(UpdateType.INIT);
   }
 
   // addComment = (updateType, data) => {
   //   const newComment = this.generateNewComment(data);
-  //   //должен быть ещё пуш в filmInfo.comments filmsInfo.comments.push(newComment.id)?
+  //
   //   this.#comments = [newComment, ...this.#comments];
   //
   //   this._notify(updateType, newComment);
   // };
 
   deleteComment = (updateType, commentId) => {
+    // const index = this.#comments.findIndex((comment) => comment.id === updatedCommentId);
+//
+// if (index === -1) {
+//   showAlert('Can\'t delete unexisting comment');
+// }
+//
+// try {
+//   await this.#apiService.deleteComment(updatedCommentId);
+//   this.#comments.splice(index, 1);
+//
+//   this._notify(updateType);
+// } catch(err) {
+//   showAlert('Can\'t delete comment');
+// }
+
     this.#comments = this.#comments.filter(({ id }) => id !== commentId);
 
     this._notify(updateType);
   }
 }
+

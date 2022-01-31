@@ -16,18 +16,15 @@ const createCommentsContainer = (comments) => (
 export default class CommentsContainerView extends AbstractView {
   #commentsList = null;
   #film = null;
-  #comments = null;
+  #comment = null;
   #commentsInfo = null;
 
-  #addComment = null;
-  #deleteComment = null;
-
-  constructor(film, commentsInfo) {
+  constructor(film, commentsInfo, callbackCommentInfo) {
     super();
     this.#film = film;
     this.#commentsInfo = commentsInfo;
-    console.log(this.#commentsInfo.length);
-    this.#renderCommentsList();
+
+    this.#renderCommentsList(callbackCommentInfo);
     return this.element;
   }
 
@@ -35,10 +32,12 @@ export default class CommentsContainerView extends AbstractView {
     return createCommentsContainer(this.#commentsInfo.length);
   }
 
-  #renderCommentsList = () => {
+  #renderCommentsList = (callbackCommentInfo) => {
     this.#commentsList = this.element.querySelector('.film-details__comments-list');
-    this.#commentsInfo.forEach((comment) => render(this.#commentsList,
-      new CommentPopupView(comment)
-    ));
+    this.#commentsInfo.forEach((comment) => {
+      this.#comment = new CommentPopupView(comment);
+      render(this.#commentsList,this.#comment);
+      this.#comment.setDeleteComment(callbackCommentInfo);
+    });
   }
 }

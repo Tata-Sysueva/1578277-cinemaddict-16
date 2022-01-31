@@ -21,7 +21,7 @@ export default class PopupContainerView extends SmartView {
   #bottomContainer = null;
   #commentsModel = null;
 
-  constructor(film, controlsCallback, commentsModel) {
+  constructor(film, controlsCallback, commentsModel, callbackCommentInfo) {
     super();
     this.#film = film;
     this.#commentsModel = commentsModel;
@@ -33,7 +33,7 @@ export default class PopupContainerView extends SmartView {
     render(this.#topContainer, new PopupFilmInfoView(this.#film));
     render(this.#topContainer, new PopupControlsView(this.#film.userDetails, controlsCallback));
 
-    render(this.#bottomContainer, new CommentsContainerView(this.#film, this.#commentsModel));
+    render(this.#bottomContainer, new CommentsContainerView(this.#film, this.#commentsModel, callbackCommentInfo));
     render(this.#bottomContainer, new NewCommentView());
   }
 
@@ -43,7 +43,8 @@ export default class PopupContainerView extends SmartView {
 
   setOnCloseButtonClick = (callback) => {
     this._callback.click = callback;
-    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#onCloseButtonClick);
+    this.element.querySelector('.film-details__close-btn')
+      .addEventListener('click', this.#onCloseButtonClick);
   }
 
   #onCloseButtonClick = (evt) => {

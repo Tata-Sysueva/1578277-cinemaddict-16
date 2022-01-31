@@ -1,4 +1,6 @@
 import AbstractView from './abstract-view';
+import {UpdateType, UserAction} from '../const';
+import dayjs from 'dayjs';
 
 const createComment = (textComment) => {
   const {author, date, comment, emotion} = textComment;
@@ -11,7 +13,7 @@ const createComment = (textComment) => {
       <p class="film-details__comment-text">${comment}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author}</span>
-        <span class="film-details__comment-day">${date}</span>
+        <span class="film-details__comment-day">${dayjs(date).format('YYYY/MM/DD HH:mm')}</span>
         <button class="film-details__comment-delete">Delete</button>
       </p>
     </div>
@@ -20,22 +22,32 @@ const createComment = (textComment) => {
 
 export default class CommentPopupView extends AbstractView {
   #commentInfo = null;
+  #callback = null;
+  #userAction = null;
+  #updateType = null;
 
-  constructor(commentInfo) {
+  constructor(commentInfo, callbackCommentInfo) {
     super();
     this.#commentInfo = commentInfo;
+    this.#callback = callbackCommentInfo;
+
+    this.setDeleteComment(callbackCommentInfo);
   }
 
   get template() {
     return createComment(this.#commentInfo);
   }
 
-  // setDeleteComment = (callback) => {
-  //   const deleteButton = this.element.querySelector('.film-details__comment-delete');
-  //   deleteButton.addEventListener('click', this.#deleteClickHandler)
-  // }
-  //
-  // #deleteClickHandler = () => {
-  //   this._callback =
-  // }
+  setDeleteComment = () => {
+    this.element.querySelector('.film-details__comment-delete')
+      .addEventListener('click', this.#deleteClickHandler);
+  }
+
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+
+    this.#userAction = UserAction.DELETE_COMMENT;
+    this.#updateType = UpdateType.PATCH;
+    this.#callback(this.#userAction, this.#updateType, this.#commentInfo.id);
+  }
 }

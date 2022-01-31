@@ -6,12 +6,16 @@ import {SortType, SortFilmsRelease, SortFilmsRating} from '../utils';
 import CardFilmPresenter from './card-film-presenter';
 import FilmsContainerView from '../view/films-container-view';
 import SortView from '../view/sort-view';
-import {FilmsInfo, FilterType, UpdateType} from '../const';
+import {FilmsInfo, FilterType, UpdateType, UserAction} from '../const';
 import {filter} from '../filters';
 import StatisticsView from '../view/statistics-view';
 import LoadingView from '../view/loading-view';
+import CommentsModel from '../model/comments-model';
+import ApiService from '../api-service';
 
 const CARDS_COUNT_PER_STEP = 5;
+const AUTHORIZATION = 'Basic c4320a4476d34d4bba63f4c6c2d65bdc';
+const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 
 const from = 0;
 const to = 2;
@@ -25,6 +29,7 @@ export default class FilmsSectionsPresenter {
   #showMoreButton = null;
   #filterModel = null;
   #statisticsComponent = null;
+  #commentsModel = null;
 
   #filmsBoardElement = new FilmsBoardView();
   #loadingComponent = new LoadingView();
@@ -66,11 +71,21 @@ export default class FilmsSectionsPresenter {
   init = () => {
     render(this.#boardContainer, this.#filmsBoardElement);
 
+    this.#commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION));
+
     this.#renderFilmsSections(from, to);
   }
 
   #handleViewAction = (updateType, update) => {
     this.#filmsModel.updateFilm(updateType, update);
+  }
+
+  #handleViewPopupAction = (actionType, updateType, commentId) => {
+    switch (actionType) {
+      case UserAction.DELETE_COMMENT:
+        this.#commentsModel.deleteComment(updateType, commentId);
+        break;
+    }
   }
 
   #handleModelEvent = (updateType, data) => {
@@ -80,8 +95,8 @@ export default class FilmsSectionsPresenter {
 
         break;
       case UpdateType.MINOR:
-        this.#clearBoard();
-        this.#renderCardList();
+        this.#clearBoard({resetRenderedFilmCount: true, resetSortType: true});
+        this.#renderFilmsSections(from, to);
 
         break;
       case UpdateType.MAJOR:
@@ -138,7 +153,7 @@ export default class FilmsSectionsPresenter {
     const filmsCount = this.films.length;
 
     remove(this.#filmsList);
-    remove(this.#filmsContainer)
+    remove(this.#filmsContainer);
     //this.#filmsContainer.innerHTML = ' ';
 
     remove(this.#sortComponent);
@@ -184,7 +199,13 @@ export default class FilmsSectionsPresenter {
   }
 
   #renderCard = (film) => {
-    const cardFilmPresenter = new CardFilmPresenter(this.#filmsContainer, this.#handleViewAction, this.#filterModel.filter);
+    const cardFilmPresenter = new CardFilmPresenter(
+      this.#filmsContainer,
+      this.#handleViewAction,
+      this.#filterModel.filter,
+      this.#handleViewPopupAction
+    );
+
     cardFilmPresenter.init(film);
     this.#cardFilmPresenter.set(film.id, cardFilmPresenter);
   }

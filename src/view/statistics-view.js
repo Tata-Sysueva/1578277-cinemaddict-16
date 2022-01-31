@@ -190,7 +190,6 @@ export default class StatisticsView extends SmartView {
 
   constructor(films) {
     super();
-    console.log(films);
     this._data = {
       films,
 

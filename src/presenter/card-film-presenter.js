@@ -17,11 +17,13 @@ export default class CardFilmPresenter {
   #changeData = null;
   #filterType = null;
   #commentsModel = null;
+  #userAction = null;
 
-  constructor(container, changeData, filterType) {
+  constructor(container, changeData, filterType, userAction) {
     this.#container = container;
     this.#changeData = changeData;
     this.#filterType = filterType;
+    this.#userAction = userAction;
   }
 
   init = (film) => {
@@ -32,13 +34,12 @@ export default class CardFilmPresenter {
     this.#filmComponent = new CardFilmView(film);
     this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick);
 
-    const getComments = async () => await new Promise(
-      () => this.#commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION)))
+    this.#commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION));
 
-    this.#filmComponent.setOnPopupClick(() => {
-      getComments().then(this.#commentsModel.init(film))
+    this.#filmComponent.setOnPopupClick(async () => {
+      await this.#commentsModel.init(film);
       const comments = this.#commentsModel.comments;
-      this.#renderPopup(film, comments);
+      this.#renderPopup(film, comments, this.userAction);
     });
 
     if (prevFilmComponent === null) {
@@ -49,17 +50,22 @@ export default class CardFilmPresenter {
     remove(prevFilmComponent);
   }
 
-  #renderPopup = (film, comments) => {
-    this.#popup = new PopupContainerView(film, this.#handleControlsClick, comments);
+  #renderPopup = (film, comments, userAction) => {
+    this.#popup = new PopupContainerView(
+      film,
+      this.#handleControlsClick,
+      comments,
+      userAction
+    );
 
-    this.#popup.setOnCloseButtonClick(this.#closePopup);
+    this.#popup.setOnCloseButtonClick(this.#handleClosePopup);
 
     render(document.body, this.#popup);
     document.body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onPopupEscKeydown);
   }
 
-  #closePopup = () => {
+  #handleClosePopup = () => {
     remove(this.#popup);
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#onPopupEscKeydown);
@@ -67,13 +73,9 @@ export default class CardFilmPresenter {
 
   #onPopupEscKeydown = (evt) => {
     if (isEscapeKey(evt)) {
-      this.#closePopup();
+      this.#handleClosePopup();
     }
   }
-
-  // #handleViewAction = (updateType, date) => {
-  //   this.#comments.addComment(updateType, date);
-  // }
 
   #handleControlsClick = (updatedDetails, userAction) => {
     this.#changeData(

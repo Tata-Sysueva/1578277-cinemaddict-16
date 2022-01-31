@@ -39,7 +39,7 @@ const createFilmInfoTemplate = (filmsInfo) => {
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Release Date</td>
-        <td class="film-details__cell">${filmInfo.release.date}</td>
+        <td class="film-details__cell">${filmInfo.release.date.getFullYear()}</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Runtime</td>
@@ -47,7 +47,7 @@ const createFilmInfoTemplate = (filmsInfo) => {
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Country</td>
-        <td class="film-details__cell">${filmInfo.release.country}</td>
+        <td class="film-details__cell">${filmInfo.release.releaseCountry}</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Genres</td>
