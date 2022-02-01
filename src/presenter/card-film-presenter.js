@@ -35,7 +35,7 @@ export default class CardFilmPresenter {
 
     this.#filmComponent.setOnPopupClick(async () => {
       await this.#commentsModel.init(film);
-      this.#renderPopup(film, this.#commentsModel.comments, this.#handleDeleteComment);
+      this.#renderPopup(film, this.#commentsModel.comments, this.#handleDeleteComment, scrollPosition);
     });
 
     if (prevFilmComponent === null) {
@@ -65,7 +65,7 @@ export default class CardFilmPresenter {
     remove(this.#filmComponent);
   }
 
-  #renderPopup = (film, comments, deleteComment) => {
+  #renderPopup = (film, comments, deleteComment, scrollPosition) => {
     this.#popup = new PopupContainerView(
       film,
       this.#handleControlsClick,
@@ -77,8 +77,11 @@ export default class CardFilmPresenter {
 
     render(document.body, this.#popup);
     document.body.classList.add('hide-overflow');
+
     document.addEventListener('keydown', this.#onPopupEscKeydown);
     document.addEventListener('keydown', this.#onCtrlEnterDown);
+
+    this.#popup.scrollPopup(scrollPosition);
   }
 
   #handleClosePopup = () => {
