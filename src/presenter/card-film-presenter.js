@@ -1,10 +1,8 @@
 import CardFilmView from '../view/card-film-view';
-import {remove, render, replace} from '../render';
+import { remove, render, replace } from '../render';
 import PopupContainerView from '../view/popup-container-view';
-import {isEscapeKey} from '../utils';
-import {UpdateType} from '../const.js';
-import CommentsModel from '../model/comments-model';
-import {getCommentArray} from '../mock/comment';
+import { isCtrlEnterEvent, isEscapeKey } from '../utils';
+import { UpdateType, UserAction } from '../const';
 
 export default class CardFilmPresenter {
   #container = null;
@@ -14,60 +12,114 @@ export default class CardFilmPresenter {
   #changeData = null;
   #filterType = null;
   #commentsModel = null;
-  #comments = null;
+  #changePopupData = null;
 
-  constructor(container, changeData, filterType) {
+  constructor(container, changeData, filterType, changePopupData, commentsModel) {
     this.#container = container;
     this.#changeData = changeData;
     this.#filterType = filterType;
+    this.#changePopupData = changePopupData;
+    this.#commentsModel = commentsModel;
   }
 
-  init = (film) => {
+  init = (film, position) => {
+    const scrollPosition = position || 0;
+
     this.#film = film;
 
     const prevFilmComponent = this.#filmComponent;
+    const prevPopupComponent = this.#popup;
 
     this.#filmComponent = new CardFilmView(film);
     this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick);
 
-    this.#comments = getCommentArray();
-    this.#commentsModel = new CommentsModel();
-    this.#commentsModel.comments = this.#comments;
-
-    this.#filmComponent.setOnPopupClick(() => this.#renderPopup(film, this.#comments));
+    this.#filmComponent.setOnPopupClick(async () => {
+      await this.#commentsModel.init(film);
+      this.#renderPopup(film, this.#commentsModel.comments, this.#handleDeleteComment, scrollPosition);
+    });
 
     if (prevFilmComponent === null) {
       render(this.#container, this.#filmComponent);
     } else {
       replace(this.#filmComponent, prevFilmComponent);
     }
+
+    if (prevPopupComponent !== null && document.body.contains(prevPopupComponent.element)) {
+      this.#popup = new PopupContainerView(
+        film,
+        this.#handleControlsClick,
+        this.#commentsModel.comments,
+        this.#handleDeleteComment,
+      );
+
+      replace(this.#popup, prevPopupComponent);
+      this.#popup.scrollPopup(scrollPosition);
+      this.#popup.setOnCloseButtonClick(this.#handleClosePopup);
+    }
+
     remove(prevFilmComponent);
+    remove(prevPopupComponent);
   }
 
-  #renderPopup = (film, comments) => {
-    this.#popup = new PopupContainerView(film, this.#handleControlsClick, comments);
+  destroy = () => {
+    remove(this.#filmComponent);
+  }
 
-    this.#popup.setOnCloseButtonClick(this.#closePopup);
+  #renderPopup = (film, comments, deleteComment, scrollPosition) => {
+    this.#popup = new PopupContainerView(
+      film,
+      this.#handleControlsClick,
+      comments,
+      deleteComment,
+    );
+
+    this.#popup.setOnCloseButtonClick(this.#handleClosePopup);
 
     render(document.body, this.#popup);
     document.body.classList.add('hide-overflow');
+
     document.addEventListener('keydown', this.#onPopupEscKeydown);
+    document.addEventListener('keydown', this.#onCtrlEnterDown);
+
+    this.#popup.scrollPopup(scrollPosition);
   }
 
-  #closePopup = () => {
+  #handleClosePopup = () => {
     remove(this.#popup);
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#onPopupEscKeydown);
+    document.removeEventListener('keydown', this.#onCtrlEnterDown);
   };
 
   #onPopupEscKeydown = (evt) => {
     if (isEscapeKey(evt)) {
-      this.#closePopup();
+      this.#handleClosePopup();
     }
   }
 
-  #handleViewAction = (updateType, date) => {
-    this.#comments.addComment(updateType, date);
+  #onCtrlEnterDown = (evt) => {
+    if (isCtrlEnterEvent(evt)) {
+      evt.preventDefault();
+
+      if (this.#popup) {
+        const formData = this.#popup.getFormData();
+        const position = this.#popup.scrollTopOffset;
+
+        const newComment = {
+          comment: formData.get('comment-text'),
+          emotion: formData.get('comment-emoji'),
+        };
+
+        const filmId = this.#film.id;
+
+        this.#changePopupData(
+          UserAction.ADD_COMMENT,
+          UpdateType.PATCH,
+          { filmId, newComment },
+          position,
+        );
+      }
+    }
   }
 
   #handleControlsClick = (updatedDetails, userAction) => {
@@ -80,6 +132,17 @@ export default class CardFilmPresenter {
     this.#changeData(
       userAction === this.#filterType ? UpdateType.MINOR : UpdateType.PATCH,
       {...this.#film, ...updatedDetails},
+    );
+  }
+
+  #handleDeleteComment = (commentId) => {
+    const position = this.#popup ? this.#popup.scrollTopOffset : 0;
+
+    this.#changePopupData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      { commentId, film: this.#film },
+      position,
     );
   }
 }

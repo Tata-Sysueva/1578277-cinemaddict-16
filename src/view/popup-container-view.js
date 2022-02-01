@@ -1,4 +1,4 @@
-import {render} from '../render';
+import { render } from '../render';
 import PopupButtonCloseView from './popup-button-close-view';
 import PopupFilmInfoView from './popup-film-info-view';
 import PopupControlsView from './popup-controls-view';
@@ -19,12 +19,10 @@ export default class PopupContainerView extends SmartView {
   #film = null;
   #topContainer = null;
   #bottomContainer = null;
-  #commentsModel = null;
 
-  constructor(film, controlsCallback, commentsModel) {
+  constructor(film, controlsCallback, comments, deleteComment) {
     super();
     this.#film = film;
-    this.#commentsModel = commentsModel;
 
     this.#topContainer = this.element.querySelector('.film-details__top-container');
     this.#bottomContainer = this.element.querySelector('.film-details__bottom-container');
@@ -33,7 +31,7 @@ export default class PopupContainerView extends SmartView {
     render(this.#topContainer, new PopupFilmInfoView(this.#film));
     render(this.#topContainer, new PopupControlsView(this.#film.userDetails, controlsCallback));
 
-    render(this.#bottomContainer, new CommentsContainerView(this.#film, this.#commentsModel));
+    render(this.#bottomContainer, new CommentsContainerView(comments, deleteComment));
     render(this.#bottomContainer, new NewCommentView());
   }
 
@@ -41,9 +39,24 @@ export default class PopupContainerView extends SmartView {
     return createPopupTemplate();
   }
 
+  get scrollTopOffset() {
+    return this.element.scrollTop;
+  }
+
+  scrollPopup = (scrollPosition) => {
+    this.element.scrollTo(0, scrollPosition);
+  }
+
+  getFormData = () => {
+    const formPopup = this.element.querySelector('.film-details__inner');
+
+    return new FormData(formPopup);
+  };
+
   setOnCloseButtonClick = (callback) => {
     this._callback.click = callback;
-    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#onCloseButtonClick);
+    this.element.querySelector('.film-details__close-btn')
+      .addEventListener('click', this.#onCloseButtonClick);
   }
 
   #onCloseButtonClick = (evt) => {

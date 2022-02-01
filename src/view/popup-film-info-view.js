@@ -7,7 +7,7 @@ const createFilmInfoTemplate = (filmsInfo) => {
 
   return `<div class="film-details__info-wrap">
     <div class="film-details__poster">
-      <img class="film-details__poster-img" src="./images/posters/${filmInfo.poster}" alt="${filmInfo.title}">
+      <img class="film-details__poster-img" src="${filmInfo.poster}" alt="${filmInfo.title}">
 
       <p class="film-details__age">${filmInfo.ageRating}</p>
     </div>
@@ -39,7 +39,7 @@ const createFilmInfoTemplate = (filmsInfo) => {
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Release Date</td>
-        <td class="film-details__cell">${filmInfo.release.date}</td>
+        <td class="film-details__cell">${filmInfo.release.date.getFullYear()}</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Runtime</td>
@@ -47,7 +47,7 @@ const createFilmInfoTemplate = (filmsInfo) => {
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Country</td>
-        <td class="film-details__cell">${filmInfo.release.country}</td>
+        <td class="film-details__cell">${filmInfo.release.releaseCountry}</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Genres</td>

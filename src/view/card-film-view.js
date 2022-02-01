@@ -1,6 +1,6 @@
 import pluralize from 'pluralize';
 import AbstractView from './abstract-view';
-import {FilterType} from '../const';
+import { FilterType } from '../const';
 
 const createCardFilm = ({ comments, filmInfo, userDetails }) => {
   const runTimeHour = Math.floor(filmInfo.runtime/60);
@@ -11,13 +11,13 @@ const createCardFilm = ({ comments, filmInfo, userDetails }) => {
       <h3 class="film-card__title">${filmInfo.title}</h3>
       <p class="film-card__rating">${filmInfo.totalRating}</p>
       <p class="film-card__info">
-        <span class="film-card__year">${filmInfo.release.date}</span>
+        <span class="film-card__year">${filmInfo.release.date.getFullYear()}</span>
         <span class="film-card__duration">${ runTimeHour }h ${ runTimeMinutes }m</span>
-        <span class="film-card__genre">${filmInfo.genre}</span>
+        <span class="film-card__genre">${filmInfo.genres[0]}</span>
       </p>
-      <img src="./images/posters/${filmInfo.poster}" alt="${filmInfo.title}" class="film-card__poster">
+      <img src="${filmInfo.poster}" alt="${filmInfo.title}" class="film-card__poster">
       <p class="film-card__description">${filmInfo.description}</p>
-      <span class="film-card__comments">${comments.size} ${pluralize('comment', comments.size)}</span>
+      <span class="film-card__comments">${comments.length} ${pluralize('comment', comments.length)}</span>
     </a>
     <div class="film-card__controls">
       <button

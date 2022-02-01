@@ -10,8 +10,7 @@ import {
 } from '../utils';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-
-const BAR_HEIGHT = 50;
+import {BAR_HEIGHT} from '../const';
 
 const statisticsItems = [
   {
@@ -122,11 +121,16 @@ const renderChart = (genresCtx, dateFrom, dateTo, films) => {
 const createStatisticsTemplate = (data) => {
   const { films, dateFrom, dateTo } = data;
   const filmsWatched = getFilmsInRange(films, dateFrom, dateTo);
-  const countFilmsWatched = filmsWatched.length; // дебильные моки и ничего не перерисовывается
+
+  const countFilmsWatched = filmsWatched.length;
   const topGenre = countFilmsWatched ? getTopGenre(films, dateFrom, dateTo) : ' ';
   let runTime = 0;
 
-  filmsWatched.forEach((film) => runTime = runTime + film.filmInfo.runtime);
+  filmsWatched.forEach((film) => {
+    runTime = runTime + film.filmInfo.runtime;
+
+    return runTime;
+  });
 
   const runTimeHour = Math.floor(runTime/60);
   const runTimeMinutes = Math.round(runTime - (runTimeHour * 60));
@@ -177,7 +181,6 @@ export default class StatisticsView extends SmartView {
 
   constructor(films) {
     super();
-
     this._data = {
       films,
 
@@ -240,7 +243,7 @@ export default class StatisticsView extends SmartView {
         dateFrom = dayjs().subtract(1, 'year').toDate();
         break;
       default:
-        throw new Error ('Can\'t find this value');
+        throw new Error (`Can't find this value ${evt.target.value}`);
     }
 
     if (!dateFrom || !dateTo) {

@@ -1,4 +1,4 @@
-import {uppercaseFirstLetter} from '../utils';
+import { uppercaseFirstLetter } from '../utils';
 import AbstractView from './abstract-view';
 
 const createFilterTemplate = (filter, currentFilterType) => {
@@ -50,12 +50,15 @@ export default class MenuView extends AbstractView {
   };
 
   #filterTypeClickHandler = (evt) => {
-    if (evt.target.tagName !== 'A') {
+    const filterItem = evt.target.closest('a');
+
+    if (!filterItem) {
       return;
     }
 
     evt.preventDefault();
 
-    this._callback.filterTypeChange(evt.target.id);
+    const filterItemHref = filterItem.getAttribute('href')?.slice?.(1);
+    this._callback.filterTypeChange(filterItemHref);
   }
 }

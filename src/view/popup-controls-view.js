@@ -1,11 +1,5 @@
 import SmartView from './smart-view';
-import {FilterType} from '../const';
-
-const ControlType = {
-  WATCHLIST: 'watchlist',
-  WATCHED: 'watched',
-  FAVORITE: 'favorite',
-};
+import { ControlType, FilterType } from '../const';
 
 const createPopupReactionsTemplate = (userDetails) => (
   `<section class="film-details__controls">
