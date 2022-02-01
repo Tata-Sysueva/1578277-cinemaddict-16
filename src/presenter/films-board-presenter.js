@@ -1,24 +1,23 @@
 import FilmsBoardView from '../view/films-board-view';
 import FilmsView from '../view/films-view';
 import ButtonShowMoreView from '../view/button-show-more';
-import {remove, render, RenderPosition} from '../render.js';
-import {SortType, SortFilmsRelease, SortFilmsRating} from '../utils';
+import { remove, render, RenderPosition } from '../render.js';
+import { SortFilmsRelease, SortFilmsRating } from '../utils';
 import CardFilmPresenter from './card-film-presenter';
 import FilmsContainerView from '../view/films-container-view';
 import SortView from '../view/sort-view';
-import {FilmsInfo, FilterType, UpdateType, UserAction} from '../const';
-import {filter} from '../filters';
+import { filter } from '../filters';
 import StatisticsView from '../view/statistics-view';
 import LoadingView from '../view/loading-view';
-import CommentsModel from '../model/comments-model';
-import ApiService from '../api-service';
+import {
+  FilmsInfo,
+  FilterType,
+  UpdateType,
+  UserAction,
+  SortType
+} from '../const';
 
 const CARDS_COUNT_PER_STEP = 5;
-const AUTHORIZATION = 'Basic c4320a4476d34d4bba63f4c6c2d65bdc';
-const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
-
-const from = 0;
-const to = 2;
 
 export default class FilmsSectionsPresenter {
   #boardContainer = null;
@@ -42,15 +41,17 @@ export default class FilmsSectionsPresenter {
   #isLoading = true;
   #isEmpty = false;
 
-  constructor(boardContainer, filmsModel, filterModel) {
+  constructor(boardContainer, filmsModel, filterModel, commentsModel) {
     this.#boardContainer = boardContainer;
     this.#filmsModel = filmsModel;
     this.#filterModel = filterModel;
+    this.#commentsModel = commentsModel;
 
     this.#renderLoading(FilmsInfo.LOADING.title, FilmsInfo.LOADING.isExtra);
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
   get films() {
@@ -71,32 +72,33 @@ export default class FilmsSectionsPresenter {
   init = () => {
     render(this.#boardContainer, this.#filmsBoardElement);
 
-    this.#commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION));
-
-    this.#renderFilmsSections(from, to);
+    this.#renderFilmsSections();
   }
 
   #handleViewAction = (updateType, update) => {
     this.#filmsModel.updateFilm(updateType, update);
   }
 
-  #handleViewPopupAction = (actionType, updateType, commentId) => {
+  #handleViewPopupAction = (actionType, updateType, update, position) => {
     switch (actionType) {
+      case UserAction.ADD_COMMENT:
+        this.#commentsModel.addComment(updateType, update, position);
+        break;
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(updateType, commentId);
+        this.#commentsModel.deleteComment(updateType, update, position);
         break;
     }
   }
 
-  #handleModelEvent = (updateType, data) => {
+  #handleModelEvent = (updateType, data, position) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#cardFilmPresenter.get(data.id).init(data);
+        this.#cardFilmPresenter.get(data.id).init(data, position);
 
         break;
       case UpdateType.MINOR:
-        this.#clearBoard({resetRenderedFilmCount: true, resetSortType: true});
-        this.#renderFilmsSections(from, to);
+        this.#clearBoard({resetRenderedFilmCount: true, resetSortType: false});
+        this.#renderFilmsSections();
 
         break;
       case UpdateType.MAJOR:
@@ -107,7 +109,7 @@ export default class FilmsSectionsPresenter {
         }
 
         this.#clearBoard({resetRenderedFilmCount: true, resetSortType: true});
-        this.#renderFilmsSections(from, to);
+        this.#renderFilmsSections();
 
         break;
       case UpdateType.DESTROY:
@@ -122,7 +124,7 @@ export default class FilmsSectionsPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
-        this.#renderFilmsSections(from, to);
+        this.#renderFilmsSections();
         break;
       default:
         throw new Error(`Unknown update type: ${updateType}`);
@@ -150,11 +152,13 @@ export default class FilmsSectionsPresenter {
   }
 
   #clearBoard = ({resetRenderedFilmCount = false, resetSortType = false} = {}) => {
+    this.#cardFilmPresenter.forEach((presenter) => presenter.destroy());
+    this.#cardFilmPresenter.clear();
+
     const filmsCount = this.films.length;
 
     remove(this.#filmsList);
     remove(this.#filmsContainer);
-    //this.#filmsContainer.innerHTML = ' ';
 
     remove(this.#sortComponent);
     this.#showMoreButton.element.remove();
@@ -188,7 +192,7 @@ export default class FilmsSectionsPresenter {
     this.#currentSortType = sortType;
 
     this.#clearBoard({resetRenderedFilmCount: true});
-    this.#renderFilmsSections(from, to);
+    this.#renderFilmsSections();
   }
 
   #renderSort = () => {
@@ -203,7 +207,8 @@ export default class FilmsSectionsPresenter {
       this.#filmsContainer,
       this.#handleViewAction,
       this.#filterModel.filter,
-      this.#handleViewPopupAction
+      this.#handleViewPopupAction,
+      this.#commentsModel,
     );
 
     cardFilmPresenter.init(film);
@@ -248,24 +253,16 @@ export default class FilmsSectionsPresenter {
     render(this.#filmsBoardElement, this.#loadingComponent);
   }
 
-  #renderFilmsSections = (from, to) => {
+  #renderFilmsSections = () => {
     if (this.#isLoading) {
       this.#renderLoading();
       return;
     }
 
-    if (this.films.length > from ) {
+    if (this.films.length) {
       this.#isEmpty = false;
 
       this.#renderFilmsSection(FilmsInfo.ALL.title, FilmsInfo.ALL.isExtra, this.films);
-      // this.#renderFilmsSection(
-      //   FilmsInfo.TOP_RATED.title,
-      //   FilmsInfo.TOP_RATED.isExtra,
-      //   getSortedFilms(this.films, SortType.BY_RATING).slice(from, to)); // NB! убрала slice из getSortedFilms
-      // this.#renderFilmsSection(
-      //   FilmsInfo.MOST_COMMENTED.title,
-      //   FilmsInfo.MOST_COMMENTED.isExtra,
-      //   getSortedFilms(this.films, SortType.BY_COMMENTED).slice(from, to));
     } else {
       this.#isEmpty = true;
 

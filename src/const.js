@@ -1,3 +1,7 @@
+export const AUTHORIZATION = 'Basic c4320a4476d34d4bba63f4c6c2d65bdc';
+export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
+export const BAR_HEIGHT = 50;
+
 export const SortType = {
   DEFAULT: 'default',
   BY_DATE: 'date',
@@ -38,4 +42,10 @@ export const FilterType = {
   HISTORY: 'history',
   FAVORITES: 'favorites',
   STATISTICS: 'stats'
+};
+
+export const ControlType = {
+  WATCHLIST: 'watchlist',
+  WATCHED: 'watched',
+  FAVORITE: 'favorite',
 };

@@ -1,13 +1,8 @@
 import CardFilmView from '../view/card-film-view';
-import {remove, render, replace} from '../render';
+import { remove, render, replace } from '../render';
 import PopupContainerView from '../view/popup-container-view';
-import {isEscapeKey} from '../utils';
-import {UpdateType} from '../const.js';
-import CommentsModel from '../model/comments-model';
-import ApiService from '../api-service';
-
-const AUTHORIZATION = 'Basic c4320a4476d34d4bba63f4c6c2d65bdc';
-const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
+import { isCtrlEnterEvent, isEscapeKey } from '../utils';
+import { UpdateType, UserAction } from '../const';
 
 export default class CardFilmPresenter {
   #container = null;
@@ -17,29 +12,30 @@ export default class CardFilmPresenter {
   #changeData = null;
   #filterType = null;
   #commentsModel = null;
-  #userAction = null;
+  #changePopupData = null;
 
-  constructor(container, changeData, filterType, userAction) {
+  constructor(container, changeData, filterType, changePopupData, commentsModel) {
     this.#container = container;
     this.#changeData = changeData;
     this.#filterType = filterType;
-    this.#userAction = userAction;
+    this.#changePopupData = changePopupData;
+    this.#commentsModel = commentsModel;
   }
 
-  init = (film) => {
+  init = (film, position) => {
+    const scrollPosition = position || 0;
+
     this.#film = film;
 
     const prevFilmComponent = this.#filmComponent;
+    const prevPopupComponent = this.#popup;
 
     this.#filmComponent = new CardFilmView(film);
     this.#filmComponent.setOnFilmControlsClick(this.#handleControlsFilmsClick);
 
-    this.#commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION));
-
     this.#filmComponent.setOnPopupClick(async () => {
       await this.#commentsModel.init(film);
-      const comments = this.#commentsModel.comments;
-      this.#renderPopup(film, comments, this.userAction);
+      this.#renderPopup(film, this.#commentsModel.comments, this.#handleDeleteComment);
     });
 
     if (prevFilmComponent === null) {
@@ -47,15 +43,34 @@ export default class CardFilmPresenter {
     } else {
       replace(this.#filmComponent, prevFilmComponent);
     }
+
+    if (prevPopupComponent !== null && document.body.contains(prevPopupComponent.element)) {
+      this.#popup = new PopupContainerView(
+        film,
+        this.#handleControlsClick,
+        this.#commentsModel.comments,
+        this.#handleDeleteComment,
+      );
+
+      replace(this.#popup, prevPopupComponent);
+      this.#popup.scrollPopup(scrollPosition);
+      this.#popup.setOnCloseButtonClick(this.#handleClosePopup);
+    }
+
     remove(prevFilmComponent);
+    remove(prevPopupComponent);
   }
 
-  #renderPopup = (film, comments, userAction) => {
+  destroy = () => {
+    remove(this.#filmComponent);
+  }
+
+  #renderPopup = (film, comments, deleteComment) => {
     this.#popup = new PopupContainerView(
       film,
       this.#handleControlsClick,
       comments,
-      userAction
+      deleteComment,
     );
 
     this.#popup.setOnCloseButtonClick(this.#handleClosePopup);
@@ -63,17 +78,44 @@ export default class CardFilmPresenter {
     render(document.body, this.#popup);
     document.body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onPopupEscKeydown);
+    document.addEventListener('keydown', this.#onCtrlEnterDown);
   }
 
   #handleClosePopup = () => {
     remove(this.#popup);
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#onPopupEscKeydown);
+    document.removeEventListener('keydown', this.#onCtrlEnterDown);
   };
 
   #onPopupEscKeydown = (evt) => {
     if (isEscapeKey(evt)) {
       this.#handleClosePopup();
+    }
+  }
+
+  #onCtrlEnterDown = (evt) => {
+    if (isCtrlEnterEvent(evt)) {
+      evt.preventDefault();
+
+      if (this.#popup) {
+        const formData = this.#popup.getFormData();
+        const position = this.#popup.scrollTopOffset;
+
+        const newComment = {
+          comment: formData.get('comment-text'),
+          emotion: formData.get('comment-emoji'),
+        };
+
+        const filmId = this.#film.id;
+
+        this.#changePopupData(
+          UserAction.ADD_COMMENT,
+          UpdateType.PATCH,
+          { filmId, newComment },
+          position,
+        );
+      }
     }
   }
 
@@ -87,6 +129,17 @@ export default class CardFilmPresenter {
     this.#changeData(
       userAction === this.#filterType ? UpdateType.MINOR : UpdateType.PATCH,
       {...this.#film, ...updatedDetails},
+    );
+  }
+
+  #handleDeleteComment = (commentId) => {
+    const position = this.#popup ? this.#popup.scrollTopOffset : 0;
+
+    this.#changePopupData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      { commentId, film: this.#film },
+      position,
     );
   }
 }

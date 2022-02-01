@@ -1,6 +1,6 @@
 import pluralize from 'pluralize';
 import AbstractView from './abstract-view';
-import {FilterType} from '../const';
+import { FilterType } from '../const';
 
 const createCardFilm = ({ comments, filmInfo, userDetails }) => {
   const runTimeHour = Math.floor(filmInfo.runtime/60);

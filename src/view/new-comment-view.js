@@ -37,7 +37,7 @@ const createNewComment = ({ text, emotion }) => (
     </div>
 
     <label class="film-details__comment-label">
-      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${text}</textarea>
+      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment-text">${text}</textarea>
     </label>
 
     ${createEmojiList(emotion)}
@@ -65,7 +65,7 @@ export default class NewCommentView extends SmartView {
       .forEach((emojiInput) => emojiInput.addEventListener('click', this.#emojiClickHandler));
 
     this.element.querySelector('.film-details__comment-input')
-      .addEventListener('input', this.#descriptionInputHandler);
+      .addEventListener('input', this.#textInputHandler);
   }
 
   #emojiClickHandler = (evt) => {
@@ -75,30 +75,11 @@ export default class NewCommentView extends SmartView {
     });
   }
 
-  #descriptionInputHandler = (evt) => {
-    this.updateData({
-      text: evt.target.value,
-    }, true);
+  #textInputHandler = (evt) => {
+    evt.preventDefault();
+    this._data = {...this._data, text: evt.target.value};
+    this.updateData(this._data, true);
   }
 
-  // setCommentAddHandler = () => {
-  //   this.element.addEventListener('keydown', this.#handleCommentAdd);
-  // }
-  //
-  // #handleCommentAdd = (evt) => {
-  //   //проверять событие клавиатуры
-  //   this.#changeData(
-  //     UserAction.ADD_COMMENT,
-  //     UpdateType.MINOR,
-  //     {
-  //       id: getRandomInteger(10, 20), ...this.#commentsInfo,
-  //       author: 'Me',
-  //       comment: this.element.querySelector('.film-details__comment-input').value,
-  //       date: 'now',
-  //       emotion: this.#emojiClickHandler,
-  //     },
-  //   );
-  //}
-
-  static parseCommentToDate = (data) => ({...data})
+  static parseCommentToDate = (comment) => ({...comment})
 }

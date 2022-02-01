@@ -10,8 +10,7 @@ import {
 } from '../utils';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-
-const BAR_HEIGHT = 50;
+import {BAR_HEIGHT} from '../const';
 
 const statisticsItems = [
   {
@@ -133,14 +132,6 @@ const createStatisticsTemplate = (data) => {
     return runTime;
   });
 
-  // const countTotalFilmsWatched = (filmsWatched) => filmsWatched.reduce((runTime, curFilm) => {
-  //   runTime = curFilm.filmInfo.runtime++;
-  //
-  //   return runTime;
-  // }, runTime);
-  //
-  // const totalRunTime = countTotalFilmsWatched(filmsWatched);
-
   const runTimeHour = Math.floor(runTime/60);
   const runTimeMinutes = Math.round(runTime - (runTimeHour * 60));
 
@@ -252,7 +243,7 @@ export default class StatisticsView extends SmartView {
         dateFrom = dayjs().subtract(1, 'year').toDate();
         break;
       default:
-        throw new Error ('Can\'t find this value');
+        throw new Error (`Can't find this value ${evt.target.value}`);
     }
 
     if (!dateFrom || !dateTo) {

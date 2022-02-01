@@ -1,5 +1,6 @@
 import AbstractObservable from '../abstract-observable';
-import {UpdateType} from '../const';
+import { UpdateType } from '../const';
+import { adaptToClient } from '../utils';
 
 export default class FilmsModel extends AbstractObservable {
   #apiService = null;
@@ -13,7 +14,7 @@ export default class FilmsModel extends AbstractObservable {
   init = async () => {
     try {
       const films = await this.#apiService.films;
-      this.#films = films.map(this.#adaptToClient);
+      this.#films = films.map(adaptToClient);
     } catch(err) {
       this.#films = [];
     }
@@ -34,7 +35,7 @@ export default class FilmsModel extends AbstractObservable {
 
     try {
       const response = await this.#apiService.updateFilm(update);
-      const updateFilm = this.#adaptToClient(response);
+      const updateFilm = adaptToClient(response);
       this.#films = [
         ...this.#films.slice(0, index),
         updateFilm,
@@ -42,46 +43,7 @@ export default class FilmsModel extends AbstractObservable {
       ];
       this._notify(updateType, updateFilm);
     } catch(err) {
-      throw new Error(`Can\'t update film. Error ${err}`);
+      throw new Error(`Can't update film. Error ${err}`);
     }
-  }
-
-  #adaptToClient = (film) => {
-    const release = {
-      date: film['film_info']['release']['date'] !== null ? new Date(film['film_info']['release']['date']) : film['film_info']['release']['date'],
-      releaseCountry: film['film_info']['release']['release_country'],
-    };
-
-    const filmInfo = {
-      title: film['film_info']['title'],
-      alternativeTitle: film['film_info']['alternative_title'],
-      totalRating: film['film_info']['total_rating'],
-      poster: film['film_info']['poster'],
-      ageRating: film['film_info']['age_rating'],
-      director: film['film_info']['director'],
-      writers: film['film_info']['writers'],
-      actors: film['film_info']['actors'],
-      release: release,
-      genres: film['film_info']['genre'],
-      runtime: film['film_info']['runtime'],
-      description: film['film_info']['description'],
-    };
-
-    const userDetails = {
-      watchlist: film['user_details']['watchlist'],
-      alreadyWatched: film['user_details']['already_watched'],
-      watchingDate: film['user_details']['watching_date'] !== null ? new Date(film['user_details']['watching_date']) : film['user_details']['watching_date'],
-      favorite: film['user_details']['favorite'],
-    };
-
-    const adaptedFilm = {...film,
-      filmInfo,
-      userDetails,
-    };
-
-    delete adaptedFilm['user_details'];
-    delete adaptedFilm['film_info'];
-
-    return adaptedFilm;
   }
 }

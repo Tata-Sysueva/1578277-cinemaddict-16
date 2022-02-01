@@ -1,6 +1,6 @@
 import AbstractView from './abstract-view';
 import CommentPopupView from './comment-view';
-import {render} from '../render';
+import { render } from '../render';
 
 const createCommentsContainer = (comments) => (
   `<section class="film-details__comments-wrap">
@@ -14,30 +14,27 @@ const createCommentsContainer = (comments) => (
 );
 
 export default class CommentsContainerView extends AbstractView {
-  #commentsList = null;
-  #film = null;
-  #comment = null;
-  #commentsInfo = null;
+  #comments = null;
+  #deleteComment = null;
 
-  constructor(film, commentsInfo, callbackCommentInfo) {
+  constructor(comments, deleteComment) {
     super();
-    this.#film = film;
-    this.#commentsInfo = commentsInfo;
+    this.#comments = comments;
+    this.#deleteComment = deleteComment;
 
-    this.#renderCommentsList(callbackCommentInfo);
-    return this.element;
+    this.#renderCommentsList();
   }
 
   get template() {
-    return createCommentsContainer(this.#commentsInfo.length);
+    return createCommentsContainer(this.#comments.length);
   }
 
-  #renderCommentsList = (callbackCommentInfo) => {
-    this.#commentsList = this.element.querySelector('.film-details__comments-list');
-    this.#commentsInfo.forEach((comment) => {
-      this.#comment = new CommentPopupView(comment);
-      render(this.#commentsList,this.#comment);
-      this.#comment.setDeleteComment(callbackCommentInfo);
+  #renderCommentsList = () => {
+    const commentsList = this.element.querySelector('.film-details__comments-list');
+    this.#comments.forEach((comment) => {
+      const commentInstance = new CommentPopupView(comment);
+      render(commentsList, commentInstance);
+      commentInstance.setOnDeleteCommentClick(this.#deleteComment);
     });
   }
 }
