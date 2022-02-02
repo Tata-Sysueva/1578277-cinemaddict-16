@@ -41,7 +41,7 @@ export const FilterType = {
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
-  STATISTICS: 'stats'
+  STATISTICS: 'stats',
 };
 
 export const ControlType = {
