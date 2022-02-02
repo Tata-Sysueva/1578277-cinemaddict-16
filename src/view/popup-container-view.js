@@ -1,8 +1,8 @@
 import { render } from '../render';
 import PopupButtonCloseView from './popup-button-close-view';
 import PopupFilmInfoView from './popup-film-info-view';
-import PopupControlsView from './popup-controls-view';
-import CommentsContainerView from './popup-comments-view';
+import PopupControlsView from './popup-reactions-view';
+import CommentsContainerView from './comments-container-view';
 import NewCommentView from './new-comment-view';
 import SmartView from './smart-view';
 

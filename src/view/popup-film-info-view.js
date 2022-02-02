@@ -5,6 +5,11 @@ const createFilmInfoTemplate = (filmsInfo) => {
     filmInfo,
   } = filmsInfo;
 
+  const runTime = filmInfo.runtime;
+
+  const runTimeHour = Math.floor(runTime/60);
+  const runTimeMinutes = Math.round(runTime - (runTimeHour * 60));
+
   return `<div class="film-details__info-wrap">
     <div class="film-details__poster">
       <img class="film-details__poster-img" src="${filmInfo.poster}" alt="${filmInfo.title}">
@@ -43,7 +48,7 @@ const createFilmInfoTemplate = (filmsInfo) => {
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Runtime</td>
-        <td class="film-details__cell">${filmInfo.runtime}h ${filmInfo.runtime}m</td>
+        <td class="film-details__cell">${ runTimeHour }h ${ runTimeMinutes }m</td>
       </tr>
       <tr class="film-details__row">
         <td class="film-details__term">Country</td>

@@ -137,42 +137,41 @@ const createStatisticsTemplate = (data) => {
 
   const rank = getRank(countFilmsWatched);
 
-  return `<section class="statistic">
-    <p class="statistic__rank">
-      Your rank
-      <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-      <span class="statistic__rank-label"> ${ rank } </span>
-    </p>
+  return (
+    `<section class="statistic">
+      <p class="statistic__rank">
+        Your rank
+        <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
+        <span class="statistic__rank-label"> ${ rank } </span>
+      </p>
 
-    <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
-      <p class="statistic__filters-description">Show stats:</p>
-      ${statisticsItems.map((filter) => createStatisticsFiltersItem(filter)).join('')}
-    </form>
+      <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
+        <p class="statistic__filters-description">Show stats:</p>
+        ${statisticsItems.map((filter) => createStatisticsFiltersItem(filter)).join('')}
+      </form>
 
-    <ul class="statistic__text-list">
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">${ countFilmsWatched } <span class="statistic__item-description">movies</span></p>
-      </li>
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">
-          ${ runTimeHour } <span class="statistic__item-description">h</span>
-          ${ runTimeMinutes } <span class="statistic__item-description">m</span></p>
-      </li>
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">${ topGenre }</p>
-      </li>
-    </ul>
+      <ul class="statistic__text-list">
+        <li class="statistic__text-item">
+          <h4 class="statistic__item-title">You watched</h4>
+          <p class="statistic__item-text">${ countFilmsWatched } <span class="statistic__item-description">movies</span></p>
+        </li>
+        <li class="statistic__text-item">
+          <h4 class="statistic__item-title">Total duration</h4>
+          <p class="statistic__item-text">
+            ${ runTimeHour } <span class="statistic__item-description">h</span>
+            ${ runTimeMinutes } <span class="statistic__item-description">m</span></p>
+        </li>
+        <li class="statistic__text-item">
+          <h4 class="statistic__item-title">Top genre</h4>
+          <p class="statistic__item-text">${ topGenre }</p>
+        </li>
+      </ul>
 
-    <!-- Пример диаграммы -->
-
-    <div class="statistic__chart-wrap">
-      <canvas class="statistic__chart" width="1000"></canvas>
-    </div>
-
-  </section>`;
+      <div class="statistic__chart-wrap">
+        <canvas class="statistic__chart" width="1000"></canvas>
+      </div>
+    </section>`
+  );
 };
 
 export default class StatisticsView extends SmartView {
