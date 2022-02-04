@@ -1,3 +1,4 @@
+import he from 'he';
 import SmartView from './smart-view';
 
 const EMOJIS = [
@@ -37,7 +38,11 @@ const createNewComment = ({ text, emotion }) => (
     </div>
 
     <label class="film-details__comment-label">
-      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment-text">${text}</textarea>
+      <textarea
+        class="film-details__comment-input"
+        placeholder="Select reaction below and write comment here"
+        name="comment-text"
+      >${he.encode(text)}</textarea>
     </label>
 
     ${createEmojiList(emotion)}

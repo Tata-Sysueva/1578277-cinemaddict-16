@@ -105,20 +105,6 @@ export default class ApiService {
 
     delete adaptedFilm.filmInfo;
     delete adaptedFilm.userDetails;
-    // delete adaptedFilm.totalRating;
-    // delete adaptedFilm.poster;
-    // delete adaptedFilm.ageRating;
-    // delete adaptedFilm.director;
-    // delete adaptedFilm.writers;
-    // delete adaptedFilm.actors;
-    // delete adaptedFilm.release;
-    // delete adaptedFilm.runtime;
-    // delete adaptedFilm.genres;
-    // delete adaptedFilm.description;
-    // delete adaptedFilm.watchlist;
-    // delete adaptedFilm.alreadyWatched;
-    // delete adaptedFilm.watchingDate;
-    // delete adaptedFilm.favorite;
 
     return adaptedFilm;
   }

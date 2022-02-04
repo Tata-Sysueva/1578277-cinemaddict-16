@@ -7,10 +7,6 @@ export const RenderPosition = {
   AFTER_END: 'afterend',
 };
 
-export const renderTemplate = (container, template, place = RenderPosition.BEFORE_END) => {
-  container.insertAdjacentHTML(place, template);
-};
-
 export const render = (container, element, place = RenderPosition.BEFORE_END) => {
   const parent = container instanceof AbstractView ? container.element : container;
   const child = element instanceof AbstractView ? element.element : element;

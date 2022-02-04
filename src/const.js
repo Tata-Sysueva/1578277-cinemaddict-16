@@ -1,6 +1,7 @@
 export const AUTHORIZATION = 'Basic c4320a4476d34d4bba63f4c6c2d65bdc';
 export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 export const BAR_HEIGHT = 50;
+export const MAX_LENGTH_DESCRIPTION = 140;
 
 export const SortType = {
   DEFAULT: 'default',
@@ -48,4 +49,21 @@ export const ControlType = {
   WATCHLIST: 'watchlist',
   WATCHED: 'watched',
   FAVORITE: 'favorite',
+};
+
+export const Mode = {
+  DEFAULT: 'DEFAULT',
+  OPENING: 'OPENING',
+};
+
+export const EMOJIS = [
+  'smile',
+  'sleeping',
+  'puke',
+  'angry',
+];
+
+export const BLANK_COMMENT = {
+  text: '',
+  emotion: EMOJIS[0],
 };

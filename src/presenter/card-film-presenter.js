@@ -1,8 +1,8 @@
 import CardFilmView from '../view/card-film-view';
 import { remove, render, replace } from '../render';
 import PopupContainerView from '../view/popup-container-view';
-import { isCtrlEnterEvent, isEscapeKey } from '../utils';
-import { UpdateType, UserAction } from '../const';
+import { isEscapeKey, isPressedEvent } from '../utils';
+import { Mode, UpdateType, UserAction } from '../const';
 
 export default class CardFilmPresenter {
   #container = null;
@@ -13,13 +13,17 @@ export default class CardFilmPresenter {
   #filterType = null;
   #commentsModel = null;
   #changePopupData = null;
+  #changeMode = null;
 
-  constructor(container, changeData, filterType, changePopupData, commentsModel) {
+  #mode = Mode.DEFAULT;
+
+  constructor(container, changeData, filterType, changePopupData, commentsModel, changeMode) {
     this.#container = container;
     this.#changeData = changeData;
     this.#filterType = filterType;
     this.#changePopupData = changePopupData;
     this.#commentsModel = commentsModel;
+    this.#changeMode = changeMode;
   }
 
   init = (film, position) => {
@@ -63,9 +67,13 @@ export default class CardFilmPresenter {
 
   destroy = () => {
     remove(this.#filmComponent);
+    this.#mode = Mode.DEFAULT;
+    this.#changeMode = null;
   }
 
   #renderPopup = (film, comments, deleteComment, scrollPosition) => {
+    this.#mode = Mode.OPENING;
+    this.#changeMode();
     this.#popup = new PopupContainerView(
       film,
       this.#handleControlsClick,
@@ -79,16 +87,22 @@ export default class CardFilmPresenter {
     document.body.classList.add('hide-overflow');
 
     document.addEventListener('keydown', this.#onPopupEscKeydown);
-    document.addEventListener('keydown', this.#onCtrlEnterDown);
+    document.addEventListener('keydown', this.#onPressedDown);
 
     this.#popup.scrollPopup(scrollPosition);
+  }
+
+  resetView = () => {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#handleClosePopup();
+    }
   }
 
   #handleClosePopup = () => {
     remove(this.#popup);
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#onPopupEscKeydown);
-    document.removeEventListener('keydown', this.#onCtrlEnterDown);
+    document.removeEventListener('keydown', this.#onPressedDown);
   };
 
   #onPopupEscKeydown = (evt) => {
@@ -97,8 +111,8 @@ export default class CardFilmPresenter {
     }
   }
 
-  #onCtrlEnterDown = (evt) => {
-    if (isCtrlEnterEvent(evt)) {
+  #onPressedDown = (evt) => {
+    if (isPressedEvent(evt)) {
       evt.preventDefault();
 
       if (this.#popup) {

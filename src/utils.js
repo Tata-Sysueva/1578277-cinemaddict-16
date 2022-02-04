@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import {MAX_LENGTH_DESCRIPTION} from './const';
 
 dayjs.extend(isBetween);
 dayjs.extend(isSameOrBefore);
@@ -66,8 +67,8 @@ export const isEscapeKey = (evt) => evt.key === 'Escape';
 
 let isControl = false;
 
-export const isCtrlEnterEvent = (evt) => {
-  if (evt.key === 'Control') {
+export const isPressedEvent = (evt) => {
+  if (evt.key === 'Control' || evt.key === 'MetaLeft') {
     isControl = true;
   }
 
@@ -143,4 +144,12 @@ export const getRank = (films) => {
     return Ranks.FAN;
   }
   return Ranks.MOVIE_BUFF;
+};
+
+export const cutDescription = (description) => {
+  if (description.length > MAX_LENGTH_DESCRIPTION) {
+    return `${description.slice(0, (MAX_LENGTH_DESCRIPTION - 4))}...`;
+  }
+
+  return description;
 };

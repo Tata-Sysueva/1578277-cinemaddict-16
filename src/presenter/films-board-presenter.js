@@ -209,10 +209,15 @@ export default class FilmsSectionsPresenter {
       this.#filterModel.filter,
       this.#handleViewPopupAction,
       this.#commentsModel,
+      this.#handleModeChange,
     );
 
     cardFilmPresenter.init(film);
     this.#cardFilmPresenter.set(film.id, cardFilmPresenter);
+  }
+
+  #handleModeChange = () => {
+    this.#cardFilmPresenter.forEach((presenter) => presenter.resetView());
   }
 
   #renderCards = (films) => {

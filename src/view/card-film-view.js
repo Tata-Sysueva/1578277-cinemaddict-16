@@ -1,10 +1,12 @@
 import pluralize from 'pluralize';
 import AbstractView from './abstract-view';
 import { FilterType } from '../const';
+import {cutDescription} from '../utils';
 
 const createCardFilm = ({ comments, filmInfo, userDetails }) => {
   const runTimeHour = Math.floor(filmInfo.runtime/60);
   const runTimeMinutes = Math.round(filmInfo.runtime - (runTimeHour * 60));
+  const description = cutDescription(filmInfo.description);
 
   return (
     `<article class="film-card">
@@ -17,7 +19,7 @@ const createCardFilm = ({ comments, filmInfo, userDetails }) => {
           <span class="film-card__genre">${filmInfo.genres[0]}</span>
         </p>
         <img src="${filmInfo.poster}" alt="${filmInfo.title}" class="film-card__poster">
-        <p class="film-card__description">${filmInfo.description}</p>
+        <p class="film-card__description">${ description }</p>
         <span class="film-card__comments">${comments.length} ${pluralize('comment', comments.length)}</span>
       </a>
       <div class="film-card__controls">

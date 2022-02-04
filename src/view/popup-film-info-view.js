@@ -55,7 +55,7 @@ const createFilmInfoTemplate = (filmsInfo) => {
         <td class="film-details__cell">${filmInfo.release.releaseCountry}</td>
       </tr>
       <tr class="film-details__row">
-        <td class="film-details__term">Genres</td>
+        <td class="film-details__term">${ filmInfo.genres.length > 1 ? 'Genres' : 'Genre' }</td>
         <td class="film-details__cell">
           ${filmInfo.genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join(' ')}
         </td>
