@@ -1,12 +1,5 @@
-import { render } from '../render';
-import PopupButtonCloseView from './popup-button-close-view';
-import PopupFilmInfoView from './popup-film-info-view';
-import PopupControlsView from './popup-reactions-view';
-import CommentsContainerView from './comments-container-view';
-import NewCommentView from './new-comment-view';
 import SmartView from './smart-view';
 import {BLANK_COMMENT, ControlType, EMOJIS, FilterType} from '../const';
-import CommentPopupView from './comment-popup-view';
 import dayjs from 'dayjs';
 import he from 'he';
 
@@ -26,7 +19,7 @@ const createFilmInfoTemplate = ({ filmInfo }) => {
     <div class="film-details__poster">
       <img class="film-details__poster-img" src="${filmInfo.poster}" alt="${filmInfo.title}">
 
-      <p class="film-details__age">${filmInfo.ageRating}</p>
+      <p class="film-details__age">${filmInfo.ageRating}+</p>
     </div>
 
     <div class="film-details__info">
@@ -83,8 +76,8 @@ const createFilmInfoTemplate = ({ filmInfo }) => {
   </div>`;
 };
 
-const createPopupReactionsTemplate = ({ userDetails }) => (
-  `<section class="film-details__controls">
+const createPopupReactionsTemplate = ({ userDetails }) => (`
+  <section class="film-details__controls">
     <button
        type="button"
        class="film-details__control-button ${userDetails.watchlist ? 'film-details__control-button--active' : ' '} film-details__control-button--watchlist"
@@ -112,45 +105,47 @@ const createPopupReactionsTemplate = ({ userDetails }) => (
   </section>`
 );
 
-const createComment = ({ author, date, comment, emotion }) => (
- ` <li class="film-details__comment">
-    <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
-    </span>
-    <div>
-      <p class="film-details__comment-text">${comment}</p>
-      <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${author}</span>
-        <span class="film-details__comment-day">${dayjs(date).format('YYYY/MM/DD HH:mm')}</span>
-        <button class="film-details__comment-delete" type="button">Delete</button>
-      </p>
-    </div>
-  </li>`
-);
+const createComment = ({ id, author, date, comment, emotion }, isDisabled, isDeleting, commentId) => {
+  const isDeletingComment = commentId === id;
 
-// const renderCommentsList = () => {
-//   const commentsList = this.element.querySelector('.film-details__comments-list');
-//   this.#comments.forEach((comment) => {
-//     const commentInstance = new CommentPopupView(comment);
-//     render(commentsList, commentInstance);
-//     commentInstance.setOnDeleteCommentClick(this.#deleteComment);
-//   });
-// }
+  return (`
+    <li class="film-details__comment">
+      <span class="film-details__comment-emoji">
+        <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
+      </span>
+      <div>
+        <p class="film-details__comment-text">${comment}</p>
+        <p class="film-details__comment-info">
+          <span class="film-details__comment-author">${author}</span>
+          <span class="film-details__comment-day">${dayjs(date).format('YYYY/MM/DD HH:mm')}</span>
+          <button
+            class="film-details__comment-delete"
+            type="button"
+            id="${id}"
+            ${isDeletingComment && isDisabled ? 'disabled' : ''}
+          >
+            ${isDeletingComment && isDeleting ? 'Deleting...' : 'Delete'}
+          </button>
+        </p>
+      </div>
+    </li>`
+  );
+};
 
-const createCommentsContainer = (comments) => (
-  `<section class="film-details__comments-wrap">
+const createCommentsContainer = (comments, isDisabled, isDeleting, commentId) => (`
+  <section class="film-details__comments-wrap">
     <h3 class="film-details__comments-title">
       Comments
       <span class="film-details__comments-count">${comments.length}</span>
     </h3>
     <ul class="film-details__comments-list">
-      ${ comments.map((comment) => createComment(comment)).join('') }
+      ${comments.map((comment) => createComment(comment, isDisabled, isDeleting, commentId)).join('')}
     </ul>
   </section>`
 );
 
-const createEmojiList = (activeEmotion) => (
-  `<div class="film-details__emoji-list">
+const createEmojiList = (activeEmotion, isDisabled) => (`
+  <div class="film-details__emoji-list">
     ${EMOJIS.map((emoji) => (
     `<input
       class="film-details__emoji-item visually-hidden"
@@ -159,6 +154,7 @@ const createEmojiList = (activeEmotion) => (
       id="emoji-${emoji}"
       value="${emoji}"
       ${emoji === activeEmotion ? 'checked' : ''}
+      ${isDisabled ? 'disabled' : ''}
     >
     <label class="film-details__emoji-label" for="emoji-${emoji}">
       <img src="./images/emoji/${emoji}.png" width="30" height="30" alt="emoji">
@@ -167,9 +163,8 @@ const createEmojiList = (activeEmotion) => (
   </div>`
 );
 
-const createNewComment = ({ text, emotion }) => {
-  return (
-    `<div class="film-details__new-comment">
+const createNewComment = ({ text, emotion }, isDisabled) => (`
+  <div class="film-details__new-comment">
     <div class="film-details__add-emoji-label">
       <img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
     </div>
@@ -179,65 +174,49 @@ const createNewComment = ({ text, emotion }) => {
         class="film-details__comment-input"
         placeholder="Select reaction below and write comment here"
         name="comment-text"
-      >${text}</textarea>
+        ${isDisabled ? 'disabled' : ''}
+      >
+        ${he.encode(text)}
+      </textarea>
     </label>
 
-    ${createEmojiList(emotion)}
+    ${createEmojiList(emotion, isDisabled)}
   </div>`
-  );
-}
+);
 
-const createPopupTemplate = (filmInfo, infoComments) => {
-  console.log(filmInfo);
-  return (
-    `<section class="film-details">
+const createPopupTemplate = (data, comments) => (`<section class="film-details">
     <form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
         ${createPopupButtonClose()}
-        ${createFilmInfoTemplate(filmInfo)}
-        ${createPopupReactionsTemplate(filmInfo)}
+        ${createFilmInfoTemplate(data)}
+        ${createPopupReactionsTemplate(data)}
       </div>
       <div class="film-details__bottom-container">
-        ${createCommentsContainer(infoComments)}
-        ${createNewComment(BLANK_COMMENT)}
+        ${createCommentsContainer(comments, data.isDisabled, data.isDeleting, data.commentId)}
+        ${createNewComment({text: data.text, emotion: data.emotion}, data.isDisabled)}
       </div>
     </form>
   </section>`
-  );
-}
+);
 
-export default class PopupContainerView extends SmartView {
+export default class PopupView extends SmartView {
   #film = null;
-  #topContainer = null;
-  #bottomContainer = null;
-
   #callback = null;
-  #userAction = null;
-  #infoComments = null;
   #comments = null;
 
   constructor(film, controlsCallback, comments, deleteComment) {
     super();
     this.#film = film;
     this.#callback = controlsCallback;
-    this.#infoComments = comments;
+    this.#comments = comments;
 
-    this.#topContainer = this.element.querySelector('.film-details__top-container');
-    this.#bottomContainer = this.element.querySelector('.film-details__bottom-container')
+    this._data = PopupView.parseFilmsToData(film, BLANK_COMMENT);
 
-    // this.#comments = this.element.querySelectorAll('.film-details__comment');
-    // this.#comments.forEach((comment) => comment.setOnDeleteCommentClick(deleteComment))
-
-
-    //this._data = PopupControlsView.parseFilmsToData(film);
-
-    this.#setInnerHandlers(controlsCallback);
-
-    //render(this.#bottomContainer, new NewCommentView());
+    this.#setInnerHandlers(deleteComment);
   }
 
   get template() {
-    return createPopupTemplate(this.#film, this.#infoComments);
+    return createPopupTemplate(this._data, this.#comments);
   }
 
   get scrollTopOffset() {
@@ -260,31 +239,35 @@ export default class PopupContainerView extends SmartView {
       .addEventListener('click', this.#onCloseButtonClick);
   }
 
-  setOnDeleteCommentClick = (cb) => {
-    this.element.querySelector('.film-details__comment-delete')
-      .addEventListener('click', () => cb(this.#infoComments.id));
-  }
-
-  #onCloseButtonClick = (evt) => {
-    evt.preventDefault();
-    this._callback.click();
-    this.#film = null;
-    this.#topContainer = null;
-    this.#bottomContainer = null;
-  }
-
   restoreHandlers = () => {
     this.#setInnerHandlers();
   }
 
-  #setInnerHandlers = () => {
-    this.element.addEventListener('click', this.#onControlsClick);
+  #setInnerHandlers = (callback) => {
+    this._callback.clickDelete = callback;
+
+    this.element.querySelector('.film-details__controls')
+      .addEventListener('click', this.#onControlsClick);
 
     this.element.querySelectorAll('.film-details__emoji-item')
       .forEach((emojiInput) => emojiInput.addEventListener('click', this.#emojiClickHandler));
 
     this.element.querySelector('.film-details__comment-input')
       .addEventListener('input', this.#textInputHandler);
+
+    this.element.querySelectorAll('.film-details__comment-delete')
+      .forEach((deleteButton) => deleteButton
+        .addEventListener('click', this.#onDeleteCommentClick));
+  }
+
+  #onCloseButtonClick = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+    this.#film = null;
+  }
+
+  #onDeleteCommentClick = (evt) => {
+    this._callback.clickDelete(evt.target.id);
   }
 
   #onControlsClick = (evt) => {
@@ -294,44 +277,48 @@ export default class PopupContainerView extends SmartView {
       return;
     }
 
+    let activeControl;
+    let userDetails;
+
     switch (evt.target.id) {
       case ControlType.WATCHLIST:
-        this.#userAction = FilterType.WATCHLIST;
-        this._data = {...this._data, watchlist: !this._data.watchlist};
+        activeControl = FilterType.WATCHLIST;
+        userDetails = {...this._data.userDetails, watchlist: !this._data.userDetails.watchlist};
         break;
       case ControlType.WATCHED:
-        this.#userAction = FilterType.HISTORY;
-        this._data = {...this._data, alreadyWatched: !this._data.alreadyWatched};
+        activeControl = FilterType.HISTORY;
+        userDetails = {...this._data.userDetails, alreadyWatched: !this._data.userDetails.alreadyWatched};
         break;
       case ControlType.FAVORITE:
-        this.#userAction = FilterType.FAVORITES;
-        this._data = {...this._data, favorite: !this._data.favorite};
+        activeControl = FilterType.FAVORITES;
+        userDetails = {...this._data.userDetails, favorite: !this._data.userDetails.favorite};
         break;
       default:
-        this._data = {...this._data};
+        throw new Error(`Unknown control type: ${evt.target.id}`);
     }
 
-    this.updateData({
-      userDetails: {...this._data}
-    });
-
-    this.#callback(this._data, this.#userAction);
+    this.#callback({...this._data, ...userDetails}, activeControl);
   };
 
   #emojiClickHandler = (evt) => {
-    evt.preventDefault();
     this.updateData({
+      ...this._data,
       emotion: evt.target.value,
     });
   }
 
   #textInputHandler = (evt) => {
-    evt.preventDefault();
-    this._data = {...this._data, text: evt.target.value};
-    this.updateData(this._data, true);
+    this.updateData({
+      ...this._data,
+      text: evt.target.value
+    }, true);
   }
 
-  static parseCommentToDate = (comment) => ({...comment})
-
-  static parseFilmsToData = (filmDetails) => ({...filmDetails});
+  static parseFilmsToData = (film) => ({
+    ...film,
+    ...BLANK_COMMENT,
+    isDisabled: false,
+    isDeleting: false,
+    commentId: null,
+  });
 }

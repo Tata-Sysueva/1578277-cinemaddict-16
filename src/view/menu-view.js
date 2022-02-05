@@ -4,25 +4,25 @@ import AbstractView from './abstract-view';
 const createFilterTemplate = (filter, currentFilterType) => {
   const {type, name, count} = filter;
 
-  return (
-    `<a
+  return (`
+    <a
       href="#${type}"
       class="main-navigation__item
       ${type === currentFilterType ? 'main-navigation__item--active' : ' '}"
       id="${type}"
     >
-    ${uppercaseFirstLetter(name)}
-    ${!count ? ' ' :
+      ${uppercaseFirstLetter(name)}
+      ${!count ? ' ' :
       `<span class="main-navigation__item-count">
        ${count}
       </span>`
     }
-  </a>`
+    </a>`
   );
 };
 
-const createSiteMenuTemplate = (filmsFilter, currentFilterType) => (
-  `<nav class="main-navigation">
+const createSiteMenuTemplate = (filmsFilter, currentFilterType) => (`
+  <nav class="main-navigation">
     <div class="main-navigation__items">
       ${filmsFilter.map((filter) => createFilterTemplate(filter, currentFilterType)).join('')}
     </div>

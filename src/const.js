@@ -1,7 +1,9 @@
-export const AUTHORIZATION = 'Basic c4320a4476d34d4bba63f4c6c2d65bdc';
+export const AUTHORIZATION = 'Basic c4320a476d34d4bba63f4c6c2d6bdc';
 export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
+
 export const BAR_HEIGHT = 50;
 export const MAX_LENGTH_DESCRIPTION = 140;
+export const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export const SortType = {
   DEFAULT: 'default',

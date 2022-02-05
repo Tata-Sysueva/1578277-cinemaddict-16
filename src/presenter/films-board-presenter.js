@@ -3,7 +3,7 @@ import FilmsView from '../view/films-view';
 import ButtonShowMoreView from '../view/button-show-more';
 import { remove, render, RenderPosition } from '../render.js';
 import { SortFilmsRelease, SortFilmsRating } from '../utils';
-import CardFilmPresenter from './card-film-presenter';
+import CardFilmPresenter, { State as CardFilmPresenterViewState }  from './card-film-presenter';
 import FilmsContainerView from '../view/films-container-view';
 import SortView from '../view/sort-view';
 import { filter } from '../filters';
@@ -14,7 +14,7 @@ import {
   FilterType,
   UpdateType,
   UserAction,
-  SortType
+  SortType,
 } from '../const';
 
 const CARDS_COUNT_PER_STEP = 5;
@@ -75,17 +75,29 @@ export default class FilmsSectionsPresenter {
     this.#renderFilmsSections();
   }
 
-  #handleViewAction = (updateType, update) => {
-    this.#filmsModel.updateFilm(updateType, update);
+  #handleViewAction = (updateType, update, position) => {
+    this.#filmsModel.updateFilm(updateType, update, position);
   }
 
-  #handleViewPopupAction = (actionType, updateType, update, position) => {
+  #handleViewPopupAction = async (actionType, updateType, update, position) => {
     switch (actionType) {
       case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(updateType, update, position);
+        this.#cardFilmPresenter.get(update.filmId).setViewState(CardFilmPresenterViewState.SAVING);
+        try {
+          await this.#commentsModel.addComment(updateType, update, position);
+        } catch(err) {
+          this.#cardFilmPresenter.get(update.filmId).setViewState(CardFilmPresenterViewState.ABORTING);
+        }
+
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(updateType, update, position);
+        this.#cardFilmPresenter.get(update.film.id).setViewState(CardFilmPresenterViewState.DELETING, update.commentId);
+        try {
+          await this.#commentsModel.deleteComment(updateType, update, position);
+        } catch(err) {
+          this.#cardFilmPresenter.get(update.film.id).setViewState(CardFilmPresenterViewState.ABORTING);
+        }
+
         break;
     }
   }

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import {MAX_LENGTH_DESCRIPTION} from './const';
+import { MAX_LENGTH_DESCRIPTION } from './const';
 
 dayjs.extend(isBetween);
 dayjs.extend(isSameOrBefore);

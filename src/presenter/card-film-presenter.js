@@ -1,8 +1,14 @@
 import CardFilmView from '../view/card-film-view';
 import { remove, render, replace } from '../render';
-import PopupContainerView from '../view/popup-container-view';
+import PopupView from '../view/popup-view';
 import { isEscapeKey, isPressedEvent } from '../utils';
-import { Mode, UpdateType, UserAction } from '../const';
+import {Mode, UpdateType, UserAction} from '../const';
+
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
 
 export default class CardFilmPresenter {
   #container = null;
@@ -49,7 +55,7 @@ export default class CardFilmPresenter {
     }
 
     if (prevPopupComponent !== null && document.body.contains(prevPopupComponent.element)) {
-      this.#popup = new PopupContainerView(
+      this.#popup = new PopupView(
         film,
         this.#handleControlsClick,
         this.#commentsModel.comments,
@@ -71,10 +77,48 @@ export default class CardFilmPresenter {
     this.#changeMode = null;
   }
 
+  resetView = () => {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#handleClosePopup();
+    }
+  }
+
+  setViewState = (state, commentId) => {
+    if (this.#mode === Mode.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#popup.updateData({
+        isDisabled: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this.#popup.updateData({
+          isDisabled: true,
+          isDeleting: false,
+        });
+        break;
+      case State.DELETING:
+        this.#popup.updateData({
+          isDisabled: true,
+          isDeleting: true,
+          commentId,
+        });
+        break;
+      case State.ABORTING:
+        this.#popup.shake(resetFormState);
+        break;
+    }
+  }
+
   #renderPopup = (film, comments, deleteComment, scrollPosition) => {
     this.#mode = Mode.OPENING;
     this.#changeMode();
-    this.#popup = new PopupContainerView(
+    this.#popup = new PopupView(
       film,
       this.#handleControlsClick,
       comments,
@@ -90,12 +134,6 @@ export default class CardFilmPresenter {
     document.addEventListener('keydown', this.#onPressedDown);
 
     this.#popup.scrollPopup(scrollPosition);
-  }
-
-  resetView = () => {
-    if (this.#mode !== Mode.DEFAULT) {
-      this.#handleClosePopup();
-    }
   }
 
   #handleClosePopup = () => {
@@ -136,21 +174,28 @@ export default class CardFilmPresenter {
     }
   }
 
-  #handleControlsClick = (updatedDetails, userAction) => {
+  #handleControlsClick = (updatedDetails, activeControl) => {
+    const position = this.#popup.scrollTopOffset;
+
     this.#changeData(
-      userAction === this.#filterType ? UpdateType.MINOR : UpdateType.PATCH,
-      {...this.#film, userDetails: {...updatedDetails}});
+      activeControl === this.#filterType ? UpdateType.MINOR : UpdateType.PATCH,
+      {...this.#film, userDetails: {...updatedDetails}},
+      position,
+    );
   }
 
-  #handleControlsFilmsClick = (updatedDetails, userAction) => {
+  #handleControlsFilmsClick = (updatedDetails, activeControl) => {
+    const position = this.#popup.scrollTopOffset;
+
     this.#changeData(
-      userAction === this.#filterType ? UpdateType.MINOR : UpdateType.PATCH,
+      activeControl === this.#filterType ? UpdateType.MINOR : UpdateType.PATCH,
       {...this.#film, ...updatedDetails},
+      position,
     );
   }
 
   #handleDeleteComment = (commentId) => {
-    const position = this.#popup ? this.#popup.scrollTopOffset : 0;
+    const position = this.#popup?.scrollTopOffset || 0;
 
     this.#changePopupData(
       UserAction.DELETE_COMMENT,

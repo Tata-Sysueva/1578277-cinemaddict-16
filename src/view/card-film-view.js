@@ -64,17 +64,17 @@ export default class CardFilmView extends AbstractView {
     this.element.addEventListener('click', this.#onPopupClick);
   }
 
+  setOnFilmControlsClick = (callbackControls) => {
+    this._callback.controlsClick = callbackControls;
+    this.element.addEventListener('click', this.#onControlsClick);
+  }
+
   #onPopupClick = (evt) => {
     evt.preventDefault();
 
     if (evt.target.tagName !== 'BUTTON') {
       this._callback.click();
     }
-  }
-
-  setOnFilmControlsClick = (callbackControls) => {
-    this._callback.controlsClick = callbackControls;
-    this.element.addEventListener('click', this.#onControlsClick);
   }
 
   #onControlsClick = (evt) => {

@@ -26,7 +26,7 @@ export default class FilmsModel extends AbstractObservable {
     return this.#films;
   }
 
-  updateFilm = async (updateType, update) => {
+  updateFilm = async (updateType, update, position) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
 
     if (index === -1) {
@@ -41,7 +41,7 @@ export default class FilmsModel extends AbstractObservable {
         updateFilm,
         ...this.#films.slice(index + 1),
       ];
-      this._notify(updateType, updateFilm);
+      this._notify(updateType, updateFilm, position);
     } catch(err) {
       throw new Error(`Can't update film. Error ${err}`);
     }
